@@ -2,10 +2,10 @@
 
 namespace App\Enums;
 
-enum FinanceType: string
+enum FinanceType: int
 {
-    case Income = 'income';
-    case Expense = 'expense';
+    case Income = 1;
+    case Expense = 2;
 
     public function label(): string
     {
