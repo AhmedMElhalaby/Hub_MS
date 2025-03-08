@@ -27,10 +27,12 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+    Route::get('settings/general', App\Livewire\Settings\SettingsList::class)->name('settings.general');
 
     Route::get('/users', App\Livewire\Users\UsersList::class)->name('users.index');
     Route::get('/users/{user}', App\Livewire\Users\UserDetails::class)->name('users.show');
     Route::get('/finances', App\Livewire\Finances\FinancesList::class)->name('finances.index');
+    Route::get('/notifications', App\Livewire\Notifications\NotificationsList::class)->name('notifications.index');
 });
 
 // Add this route with your other authenticated routes

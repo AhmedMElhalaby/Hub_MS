@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Enums\BookingStatus;
+use App\Services\MikrotikService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
+use \Illuminate\Support\Facades\Log;
 
 class Booking extends Model
 {
@@ -20,9 +23,10 @@ class Booking extends Model
         'ended_at',
         'total',
         'balance',
-        'status'
+        'status',
+        'hotspot_username',
+        'hotspot_password'
     ];
-
     protected $casts = [
         'status' => BookingStatus::class,
         'started_at' => 'datetime',
@@ -32,7 +36,6 @@ class Booking extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -42,14 +45,17 @@ class Booking extends Model
     {
         return $this->belongsTo(Workspace::class);
     }
-
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
     }
-
     public function finances(): HasMany
     {
         return $this->hasMany(Finance::class);
     }
+
+    protected static function booted()
+    {
+    }
+
 }

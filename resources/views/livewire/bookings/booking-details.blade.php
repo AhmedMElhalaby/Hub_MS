@@ -140,4 +140,48 @@
             </flux:card.content>
         </flux:card>
     </div>
+
+    @if($booking->hotspot_username)
+        <flux:card class="mt-6">
+            <flux:card.header>
+                <flux:heading size="sm">{{ __('Hotspot Access Details') }}</flux:heading>
+            </flux:card.header>
+            <flux:card.content>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">{{ __('Username') }}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-mono">{{ $booking->hotspot_username }}</span>
+                            <button
+                                x-data
+                                x-on:click="
+                                    navigator.clipboard.writeText('{{ $booking->hotspot_username }}');
+                                    $dispatch('notify', { message: '{{ __('Username copied to clipboard!') }}' })
+                                "
+                                class="inline-flex items-center justify-center size-8 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+                            >
+                                <flux:icon name="clipboard" class="size-4" />
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">{{ __('Password') }}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-mono">{{ $booking->hotspot_password }}</span>
+                            <button
+                                x-data
+                                x-on:click="
+                                    navigator.clipboard.writeText('{{ $booking->hotspot_password }}');
+                                    $dispatch('notify', { message: '{{ __('Password copied to clipboard!') }}' })
+                                "
+                                class="inline-flex items-center justify-center size-8 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+                            >
+                                <flux:icon name="clipboard" class="size-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </flux:card.content>
+        </flux:card>
+    @endif
 </div>

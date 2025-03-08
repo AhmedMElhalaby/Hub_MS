@@ -1,3 +1,6 @@
+@php
+    use App\Models\Setting;
+@endphp
 <div class="p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
@@ -37,6 +40,17 @@
                         @endif
                     </button>
                 </flux:table.head>
+                @if(Setting::get('mikrotik_enabled'))
+                <flux:table.head>
+                    <button wire:click="sortBy('mikrotik_profile')" class="flex items-center space-x-1">
+                        <span>{{ __('Mikrotik Profile') }}</span>
+                        @if ($sortField === 'mikrotik_profile')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}"
+                                class="size-4" />
+                        @endif
+                    </button>
+                </flux:table.head>
+                @endif
                 <flux:table.head>{{ __('Actions') }}</flux:table.head>
             </x-slot:header>
 
@@ -45,6 +59,9 @@
                     <flux:table.row wire:key="{{ $plan->id }}">
                         <flux:table.cell>{{ $plan->type->label() }}</flux:table.cell>
                         <flux:table.cell>{{ number_format($plan->price, 2) }}</flux:table.cell>
+                        @if(Setting::get('mikrotik_enabled'))
+                            <flux:table.cell>{{ $plan->mikrotik_profile }}</flux:table.cell>
+                        @endif
                         <flux:table.cell>
                             <div class="flex space-x-2">
                                 <flux:button wire:navigate href="{{ route('plans.show', $plan) }}" size="sm">
@@ -62,7 +79,7 @@
                     </flux:table.row>
                 @empty
                     <flux:table.row>
-                        <flux:table.cell colspan="3" class="text-center">
+                        <flux:table.cell colspan="{{ Setting::get('mikrotik_enabled') ? 4 : 3 }}" class="text-center">
                             {{ __('No plans found.') }}
                         </flux:table.cell>
                     </flux:table.row>
@@ -103,7 +120,18 @@
                 required
                 :error="$errors->first('price')"
             />
-
+            @if(Setting::get('mikrotik_enabled'))
+            <flux:select
+                wire:model="mikrotik_profile"
+                label="{{ __('Mikrotik Profile') }}"
+                required
+                :error="$errors->first('mikrotik_profile')">
+                <option value="">{{ __('Select Profile') }}</option>
+                @foreach($availableProfiles as $profile)
+                    <option value="{{ $profile }}">{{ $profile }}</option>
+                @endforeach
+            </flux:select>
+            @endif
             <div class="flex justify-end space-x-2 mt-10">
                 <flux:button type="button" wire:click="resetForm" variant="outline">
                     {{ __('Cancel') }}
@@ -133,3 +161,4 @@
         </div>
     </flux:modal>
 </div>
+```

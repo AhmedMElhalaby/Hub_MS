@@ -14,6 +14,11 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use App\Traits\WithSorting;
 use App\Enums\FinanceType;
+use App\Jobs\CreateHotspotUser;
+use App\Jobs\RemoveHotspotUser;
+use App\Models\Setting;
+use Illuminate\Support\Facades\DB;
+use \Illuminate\Support\Facades\Log;
 
 #[Layout('components.layouts.app')]
 class BookingsList extends Component
@@ -37,7 +42,12 @@ class BookingsList extends Component
     public $search = '';
     public $statusFilter = '';
     public $dateFilter = '';
+    public $mikrotikEnabled = false;
 
+    public function mount()
+    {
+        $this->mikrotikEnabled = Setting::get('mikrotik_enabled', false);
+    }
     public function resetFilters()
     {
         $this->search = '';
@@ -46,6 +56,20 @@ class BookingsList extends Component
     }
     public function updatedPlanId()
     {
+        if ($this->planId) {
+            $plan = Plan::find($this->planId);
+            $now = now();
+
+            // Set default start time based on plan type
+            if ($plan->type === PlanType::Hourly) {
+                // Start from next hour
+                $this->startedAt = $now->addHour()->startOfHour()->format('Y-m-d\TH:i');
+            } else {
+                // For daily, weekly, monthly plans, start at 9 AM next day
+                $this->startedAt = $now->addDay()->setHour(9)->setMinute(0)->format('Y-m-d\TH:i');
+            }
+        }
+
         $this->calculateEndDate();
         $this->calculateTotal();
     }
@@ -117,8 +141,8 @@ class BookingsList extends Component
             'customerId' => 'required|exists:customers,id',
             'workspaceId' => 'required|exists:workspaces,id',
             'planId' => 'required|exists:plans,id',
-            'startedAt' => 'required|date|after:now',
-            'endedAt' => 'required|date|after:startedAt',
+            'startedAt' => 'required|date', // Removed 'after:now' validation
+            'endedAt' => 'required|date|after:startedAt', // Only validate that end date is after start date
         ]);
 
         $booking = Booking::create([
@@ -132,6 +156,9 @@ class BookingsList extends Component
             'status' => BookingStatus::Draft,
         ]);
         $booking->workspace->markAsBooked();
+        if ($this->mikrotikEnabled) {
+            CreateHotspotUser::dispatch($booking);
+        }
         session()->flash('message', __('Booking created successfully.'));
         $this->closeModal();
     }
@@ -149,27 +176,55 @@ class BookingsList extends Component
             'paymentAmount' => 'required|numeric|min:0|max:' . $this->selectedBooking->balance,
         ]);
 
-        // Process payment and update booking status
-        $this->selectedBooking->update([
-            'balance' => $this->selectedBooking->balance - $this->paymentAmount,
-            'status' => BookingStatus::Confirmed,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        // Create payment record
-        $this->selectedBooking->finances()->create([
-            'amount' => $this->paymentAmount,
-            'type' => FinanceType::Income,
-        ]);
+            // Process payment and update booking status
+            $this->selectedBooking->update([
+                'balance' => $this->selectedBooking->balance - $this->paymentAmount,
+                'status' => BookingStatus::Confirmed,
+            ]);
 
-        $this->showPaymentModal = false;
-        session()->flash('message', __('Payment processed successfully.'));
+            // Create payment record
+            $this->selectedBooking->finances()->create([
+                'amount' => $this->paymentAmount,
+                'type' => FinanceType::Income,
+            ]);
+            DB::commit();
+
+            $this->showPaymentModal = false;
+            session()->flash('message', __('Payment processed successfully.'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', __('Failed to process payment.'));
+            Log::error('Payment processing failed', [
+                'booking_id' => $this->selectedBooking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function cancelBooking(Booking $booking)
     {
-        $booking->update(['status' => BookingStatus::Cancelled]);
-        $booking->workspace->markAsAvailable();
-        session()->flash('message', __('Booking cancelled successfully.'));
+        try {
+            DB::beginTransaction();
+
+            $booking->update(['status' => BookingStatus::Cancelled]);
+            $booking->workspace->markAsAvailable();
+
+            // Dispatch hotspot user removal job
+            RemoveHotspotUser::dispatch($booking);
+
+            DB::commit();
+            session()->flash('message', __('Booking cancelled successfully.'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', __('Failed to cancel booking.'));
+            Log::error('Booking cancellation failed', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function renewBooking(Booking $booking)

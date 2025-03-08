@@ -6,6 +6,9 @@ use App\Models\Plan;
 use App\Traits\WithModal;
 use App\Traits\WithSorting;
 use App\Enums\PlanType;
+use App\Models\Setting;
+use App\Services\MikrotikService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
@@ -18,7 +21,29 @@ class PlansList extends Component
 
     public $type = '';
     public $price = '';
+    public $mikrotikEnabled = false;
+    public $mikrotik_profile;
+    public $availableProfiles = [];
+    public $types = [];
     public $planId;
+
+    public function mount()
+    {
+        $this->mikrotikEnabled = Setting::get('mikrotik_enabled', false);
+        $this->types = PlanType::cases();
+
+        if ($this->mikrotikEnabled) {
+            try {
+                $mikrotik = new MikrotikService();
+                $this->availableProfiles = collect($mikrotik->getHotspotProfiles())
+                    ->pluck('name')
+                    ->toArray();
+            } catch (\Exception $e) {
+                Log::error('Failed to fetch Mikrotik profiles', ['error' => $e->getMessage()]);
+                $this->availableProfiles = [];
+            }
+        }
+    }
 
     public function create()
     {
@@ -31,6 +56,7 @@ class PlansList extends Component
         $this->planId = $plan->id;
         $this->type = $plan->type->value;
         $this->price = $plan->price;
+        $this->mikrotik_profile = $this->mikrotik_profile;
         $this->openModal();
     }
 
@@ -46,6 +72,7 @@ class PlansList extends Component
             'planId',
             'type',
             'price',
+            'mikrotik_profile'
         ]);
     }
 
@@ -54,6 +81,7 @@ class PlansList extends Component
         $validated = $this->validate([
             'type' => ['required', new Enum(PlanType::class)],
             'price' => 'required|numeric|min:0',
+            'mikrotik_profile' => 'nullable|string'
         ]);
 
         if ($this->planId) {
@@ -83,12 +111,11 @@ class PlansList extends Component
     public function render()
     {
         return view('livewire.plans.plans-list', [
-            'plans' => Plan::when($this->search, function($query) {
-                $query->where('type', 'like', '%'.$this->search.'%');
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage),
-            'types' => PlanType::cases()
+            'plans' => Plan::query()
+                ->when(!$this->mikrotikEnabled, function ($query) {
+                    $query->where('mikrotik_profile', null);
+                })
+                ->paginate(10)
         ]);
     }
 }

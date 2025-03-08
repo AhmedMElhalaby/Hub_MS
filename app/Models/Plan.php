@@ -13,7 +13,8 @@ class Plan extends Model
 
     protected $fillable = [
         'type',
-        'price'
+        'price',
+        'mikrotik_profile',
     ];
 
     protected $casts = [

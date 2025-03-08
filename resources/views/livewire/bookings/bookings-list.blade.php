@@ -95,7 +95,11 @@
 
             <x-slot:body>
                 @forelse($bookings as $booking)
-                    <flux:table.row wire:key="{{ $booking->id }}">
+                    <flux:table.row
+                        wire:key="{{ $booking->id }}"
+                        class="cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                        onclick="window.location.href='{{ route('bookings.show', $booking) }}'"
+                    >
                         <flux:table.cell>{{ $booking->customer->name }}</flux:table.cell>
                         <flux:table.cell>{{ $booking->workspace->desk }}</flux:table.cell>
                         <flux:table.cell>{{ $booking->plan->type->label() }}</flux:table.cell>
@@ -113,7 +117,7 @@
                             </flux:badge>
                         </flux:table.cell>
                         <flux:table.cell>
-                            <div class="flex space-x-2">
+                            <div class="flex space-x-2" onclick="event.stopPropagation()">
                                 @if($booking->status->canConfirm())
                                     <flux:button wire:click="confirmBooking({{ $booking->id }})" size="sm">
                                         {{ __('Confirm') }}
@@ -207,6 +211,7 @@
                     label="{{ __('Start Date') }}"
                     required
                     :error="$errors->first('startedAt')"
+                    value="{{ $startedAt }}"
                 />
 
                 <flux:input

@@ -1,7 +1,26 @@
+@php
+    use App\Models\Setting;
+
+    $appName = Setting::get('app_name', config('app.name'));
+    $primaryColor = Setting::get('primary_color', '#000000');
+    $secondaryColor = Setting::get('secondary_color', '#666666');
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+        <title>{{ $appName }}</title>
+
+        @if($favicon = Setting::get('app_favicon'))
+            <link rel="icon" type="image/x-icon" href="{{ Storage::url($favicon) }}">
+        @endif
+
+        <style>
+            :root {
+                --primary-color: {{ $primaryColor }};
+                --secondary-color: {{ $secondaryColor }};
+            }
+        </style>
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
@@ -27,6 +46,17 @@
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="banknotes" :href="route('finances.index')" :current="request()->routeIs('finances.*')" wire:navigate>{{ __('Finances') }}</flux:navlist.item>
                 <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.index')" wire:navigate>{{ __('Manage Users') }}</flux:navlist.item>
+                <flux:navlist.item icon="bell" :href="route('notifications.index')" :current="request()->routeIs('notifications.*')" wire:navigate class="relative">
+                    {{ __('Notifications') }}
+                    @php
+                        $unreadCount = auth()->user()->unreadNotifications()->count();
+                    @endphp
+                    @if($unreadCount > 0)
+                        <span class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center min-w-[20px] h-5 text-xs font-bold text-white bg-red-600 rounded-full px-1">
+                            {{ $unreadCount }}
+                        </span>
+                    @endif
+                </flux:navlist.item>
             </flux:navlist>
 
             <!-- Desktop User Menu -->

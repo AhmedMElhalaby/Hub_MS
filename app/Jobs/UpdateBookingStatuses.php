@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Booking;
+use App\Models\User;
 use App\Enums\BookingStatus;
+use App\Notifications\BookingCompleted;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -32,6 +34,12 @@ class UpdateBookingStatuses implements ShouldQueue
 
                     $booking->update(['status' => BookingStatus::Completed]);
                     $booking->workspace->markAsAvailable();
+
+                    // Send notification to all admin users
+                    User::query()
+                        ->each(function ($admin) use ($booking) {
+                            $admin->notify(new BookingCompleted($booking));
+                        });
 
                     DB::commit();
 
