@@ -2,15 +2,15 @@
 
 namespace App\Enums;
 
-enum ExpenseCategory: string
+enum ExpenseCategory: int
 {
-    case Electricity = 'electricity';
-    case Water = 'water';
-    case Rent = 'rent';
-    case Internet = 'internet';
-    case Supplies = 'supplies';
-    case Salaries = 'salaries';
-    case Others = 'other';
+    case Electricity = 1;
+    case Water = 2;
+    case Rent = 3;
+    case Internet = 4;
+    case Supplies = 5;
+    case Salaries = 6;
+    case Others = 0;
 
     public function label(): string
     {

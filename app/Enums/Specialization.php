@@ -2,10 +2,10 @@
 
 namespace App\Enums;
 
-enum Specialization: string
+enum Specialization: int
 {
-    case Student = 'student';
-    case Teacher = 'teacher';
-    case Developer = 'developer';
-    case Designer = 'designer';
+    case Student = 1;
+    case Teacher = 2;
+    case Developer = 3;
+    case Designer = 4;
 }

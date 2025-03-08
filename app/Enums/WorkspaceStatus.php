@@ -2,11 +2,11 @@
 
 namespace App\Enums;
 
-enum WorkspaceStatus: string
+enum WorkspaceStatus: int
 {
-    case Booked = 'booked';
-    case Available = 'available';
-    case Maintenance = 'maintenance';
+    case Booked = 0;
+    case Available = 1;
+    case Maintenance = 2;
 
     public function label(): string
     {

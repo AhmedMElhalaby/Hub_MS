@@ -2,12 +2,12 @@
 
 namespace App\Enums;
 
-enum BookingStatus: string
+enum BookingStatus: int
 {
-    case Draft = 'draft';
-    case Confirmed = 'confirmed';
-    case Cancelled = 'cancelled';
-    case Completed = 'completed';
+    case Draft = 0;
+    case Confirmed = 1;
+    case Cancelled = 2;
+    case Completed = 3;
 
     public function label(): string
     {

@@ -21,7 +21,9 @@ return new class extends Migration
             $table->timestamp('ended_at');
             $table->decimal('total', 8, 2);
             $table->decimal('balance', 8, 2);
-            $table->enum('status',enum_values(BookingStatus::class))->default(BookingStatus::Confirmed->value);
+            $table->string('hotspot_username')->nullable();
+            $table->string('hotspot_password')->nullable();
+            $table->tinyInteger('status')->default(BookingStatus::Confirmed->value);
             $table->timestamps();
         });
     }

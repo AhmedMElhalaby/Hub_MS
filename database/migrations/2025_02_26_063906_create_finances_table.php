@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\FinanceType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('finances', function (Blueprint $table) {
             $table->id();
-            $table->enum('type',enum_values(FinanceType::class));
+            $table->tinyInteger('type');
             $table->foreignId('booking_id')->nullable()->constrained('bookings')->cascadeOnDelete();
             $table->foreignId('expense_id')->nullable()->constrained('expenses')->cascadeOnDelete();
             $table->decimal('amount',8,2);

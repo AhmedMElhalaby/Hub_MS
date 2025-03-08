@@ -2,12 +2,12 @@
 
 namespace App\Enums;
 
-enum PlanType: string
+enum PlanType: int
 {
-    case Hourly = 'hourly';
-    case Daily = 'daily';
-    case Weekly = 'weekly';
-    case Monthly = 'monthly';
+    case Hourly = 1;
+    case Daily = 2;
+    case Weekly = 3;
+    case Monthly = 4;
 
     public function label(): string
     {
