@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Finance;
 use App\Models\Workspace;
 use App\Enums\BookingStatus;
+use App\Enums\FinanceType;
 use App\Enums\WorkspaceStatus;
 
 class DashboardController extends Controller
@@ -18,7 +19,7 @@ class DashboardController extends Controller
 
 
         return view('dashboard', [
-            'totalRevenue' => Finance::where('type', 'income')->sum('amount'),
+            'totalRevenue' => Finance::where('type', FinanceType::Income)->sum('amount'),
             'activeBookings' => Booking::where('status', BookingStatus::Confirmed)->count(),
             'availableWorkspaces' => Workspace::where('status', WorkspaceStatus::Available)->count(),
             'recentBookings' => Booking::with(['customer', 'workspace'])
