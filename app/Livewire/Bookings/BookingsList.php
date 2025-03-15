@@ -296,7 +296,6 @@ class BookingsList extends Component
 
             $this->selectedBooking->update([
                 'balance' => $this->selectedBooking->balance - $this->paymentAmount,
-                'status' => BookingStatus::Confirmed,
             ]);
 
             $this->selectedBooking->finances()->create([
