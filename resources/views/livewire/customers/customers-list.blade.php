@@ -1,9 +1,8 @@
 <div class="p-6">
-
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <flux:heading>{{ __('Customers Management') }}</flux:heading>
-        <flux:button wire:click="create" variant="primary">
+        <flux:button wire:click="$dispatch('open-create-customer')" variant="primary">
             {{ __('Add New Customer') }}
         </flux:button>
     </div>
@@ -106,60 +105,7 @@
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
-    <flux:modal wire:model="showModal" variant="flyout">
-        <form wire:submit.prevent="save" class="space-y-6">
-            <flux:heading size="lg">
-                {{ $customerId ? __('Edit Customer') : __('Create Customer') }}
-            </flux:heading>
 
-            <flux:input
-                wire:model.live="name"
-                label="{{ __('Name') }}"
-                required
-                :error="$errors->first('name')"
-            />
-            <flux:input
-                wire:model.live="email"
-                label="{{ __('Email') }}"
-                type="email"
-                required
-                :error="$errors->first('email')"
-            />
-            <flux:input
-                wire:model.live="mobile"
-                label="{{ __('Mobile') }}"
-                :error="$errors->first('mobile')"
-            />
-            <flux:input
-                wire:model.live="address"
-                label="{{ __('Address') }}"
-                :error="$errors->first('address')"
-            />
-            <flux:select
-                wire:model.live="specialization"
-                label="{{ __('Specialization') }}"
-                required
-                :error="$errors->first('specialization')"
-            >
-                <option value="">{{ __('Select Specialization') }}</option>
-                @foreach($specializations as $specialization)
-                    <option value="{{ $specialization->value }}">{{ $specialization->name }}</option>
-                @endforeach
-            </flux:select>
-
-            <div class="flex justify-end space-x-2 mt-10">
-                <flux:button type="button" wire:click="resetForm" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button wire:loading.attr="disabled" wire:target="save" type="submit"
-                    variant="primary">
-                    <span wire:loading.remove wire:target="save">{{ __('Save') }}</span>
-                    <span wire:loading wire:target="save">{{ __('Saving...') }}</span>
-                </flux:button>
-            </div>
-        </form>
-    </flux:modal>
 
     <!-- Delete Confirmation Modal -->
     <flux:modal wire:model="showDeleteModal">
@@ -176,4 +122,8 @@
             </div>
         </div>
     </flux:modal>
+    <livewire:customers.create-customer />
+
 </div>
+
+<!-- Add the component at the bottom -->

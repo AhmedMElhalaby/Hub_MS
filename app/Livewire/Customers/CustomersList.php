@@ -15,76 +15,18 @@ class CustomersList extends Component
 {
     use WithPagination, WithSorting, WithModal;
 
-    public $name = '';
-    public $email = '';
-    public $mobile = '';
-    public $address = '';
-    public $specialization = '';
     public $customerId;
     public $specializationFilter = '';
 
-    public function resetForm()
+    public function edit($customerId)
     {
-        $this->reset([
-            'customerId',
-            'name',
-            'email',
-            'mobile',
-            'address',
-            'specialization',
-        ]);
-    }
-
-    public function create()
-    {
-        $this->resetForm();
-        $this->openModal();
-    }
-
-    public function edit(Customer $customer)
-    {
-        $this->customerId = $customer->id;
-        $this->name = $customer->name;
-        $this->email = $customer->email;
-        $this->mobile = $customer->mobile;
-        $this->address = $customer->address;
-        $this->specialization = $customer->specialization->value;
-        $this->openModal();
+        $this->dispatch('edit-customer', customerId: $customerId);
     }
 
     public function confirmDelete(Customer $customer)
     {
         $this->customerId = $customer->id;
         $this->openDeleteModal();
-    }
-
-    public function save()
-    {
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email,' . $this->customerId,
-            'mobile' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
-            'specialization' => 'required',
-        ]);
-
-        $data = [
-            'name' => $this->name,
-            'email' => $this->email,
-            'mobile' => $this->mobile,
-            'address' => $this->address,
-            'specialization' => $this->specialization,
-        ];
-
-        if ($this->customerId) {
-            Customer::findOrFail($this->customerId)->update($data);
-        } else {
-            Customer::create($data);
-        }
-
-        session()->flash('message', __('Customer saved successfully.'));
-        $this->closeModal();
-        $this->redirect(request()->header('Referer'), navigate: true);
     }
 
     public function delete()
@@ -95,6 +37,7 @@ class CustomersList extends Component
             session()->flash('message', __('Customer deleted successfully.'));
             $this->closeDeleteModal();
         } catch (\Exception $e) {
+            dd($e);
             session()->flash('error', __('An error occurred while deleting the customer.'));
         }
         $this->redirect(request()->header('Referer'), navigate: true);

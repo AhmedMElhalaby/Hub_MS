@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\FinanceType;
+use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +17,8 @@ class Finance extends Model
         'booking_id',
         'expense_id',
         'amount',
-        'note'
+        'note',
+        'payment_method'
     ];
 
     protected $casts = [
@@ -24,6 +26,7 @@ class Finance extends Model
         'amount' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'payment_method' => PaymentMethod::class
     ];
 
     public function booking(): BelongsTo

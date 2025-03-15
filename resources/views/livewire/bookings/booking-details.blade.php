@@ -1,6 +1,7 @@
 <div class="p-6">
-    <div class="mb-6">
+    <div class="mb-6 flex items-center justify-between">
         <flux:heading>{{ __('Booking Details') }}</flux:heading>
+        <x-booking.actions :booking="$booking" />
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
@@ -56,7 +57,7 @@
                     </div>
                     <div>
                         <div class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Phone') }}</div>
-                        <div>{{ $booking->customer->phone }}</div>
+                        <div>{{ $booking->customer->mobile }}</div>
                     </div>
                 </flux:card.content>
             </flux:card>
@@ -141,10 +142,64 @@
         </flux:card>
     </div>
 
+    <!-- Event History -->
+    <div class="mt-6">
+        <flux:card>
+            <flux:card.header>
+                <flux:heading size="sm">{{ __('Event History') }}</flux:heading>
+            </flux:card.header>
+            <flux:card.content>
+                <flux:table>
+                    <x-slot:header>
+                        <flux:table.head>{{ __('Date') }}</flux:table.head>
+                        <flux:table.head>{{ __('Event') }}</flux:table.head>
+                        <flux:table.head>{{ __('User') }}</flux:table.head>
+                        <flux:table.head>{{ __('Details') }}</flux:table.head>
+                    </x-slot:header>
+                    <x-slot:body>
+                        @forelse($booking->events()->latest()->get() as $event)
+                            <flux:table.row>
+                                <flux:table.cell>{{ $event->created_at->format('M d, Y H:i') }}</flux:table.cell>
+                                <flux:table.cell>{{ $event->event_type }}</flux:table.cell>
+                                <flux:table.cell>{{ $event->user?->name ?? '-' }}</flux:table.cell>
+                                <flux:table.cell>
+                                    @if($event->metadata)
+                                        <div class="space-y-1">
+                                            @foreach($event->metadata as $key => $value)
+                                                <div class="text-sm">
+                                                    <span class="font-medium">{{ Str::title($key) }}:</span>
+                                                    <span>{{ $value }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        -
+                                    @endif
+                                </flux:table.cell>
+                            </flux:table.row>
+                        @empty
+                            <flux:table.row>
+                                <flux:table.cell colspan="5" class="text-center">{{ __('No events found.') }}</flux:table.cell>
+                            </flux:table.row>
+                        @endforelse
+                    </x-slot:body>
+                </flux:table>
+            </flux:card.content>
+        </flux:card>
+    </div>
+
     @if($booking->hotspot_username)
         <flux:card class="mt-6">
-            <flux:card.header>
+            <flux:card.header class="flex items-center justify-between">
                 <flux:heading size="sm">{{ __('Hotspot Access Details') }}</flux:heading>
+                <flux:button
+                    wire:click="$set('showCredentialsModal', true)"
+                    variant="outline"
+                    size="sm"
+                    class="flex space-x-2"
+                >
+                    {{ __('Send Credentials') }}
+                </flux:button>
             </flux:card.header>
             <flux:card.content>
                 <div class="space-y-4">
@@ -152,36 +207,81 @@
                         <span class="text-sm font-medium">{{ __('Username') }}</span>
                         <div class="flex items-center space-x-2">
                             <span class="font-mono">{{ $booking->hotspot_username }}</span>
-                            <button
+                            <flux:button
                                 x-data
                                 x-on:click="
-                                    navigator.clipboard.writeText('{{ $booking->hotspot_username }}');
-                                    $dispatch('notify', { message: '{{ __('Username copied to clipboard!') }}' })
+                                    $el.setAttribute('disabled', true);
+                                    await navigator.clipboard.writeText('{{ $booking->hotspot_username }}');
+                                    $dispatch('notify', { message: 'Username copied!' });
+                                    $el.removeAttribute('disabled');
                                 "
-                                class="inline-flex items-center justify-center size-8 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+                                size="xs"
+                                variant="ghost"
                             >
                                 <flux:icon name="clipboard" class="size-4" />
-                            </button>
+                            </flux:button>
                         </div>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium">{{ __('Password') }}</span>
                         <div class="flex items-center space-x-2">
                             <span class="font-mono">{{ $booking->hotspot_password }}</span>
-                            <button
+                            <flux:button
                                 x-data
                                 x-on:click="
-                                    navigator.clipboard.writeText('{{ $booking->hotspot_password }}');
-                                    $dispatch('notify', { message: '{{ __('Password copied to clipboard!') }}' })
+                                    $el.setAttribute('disabled', true);
+                                    await navigator.clipboard.writeText('{{ $booking->hotspot_password }}');
+                                    $dispatch('notify', { message: 'Password copied!' });
+                                    $el.removeAttribute('disabled');
                                 "
-                                class="inline-flex items-center justify-center size-8 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+                                size="xs"
+                                variant="ghost"
                             >
                                 <flux:icon name="clipboard" class="size-4" />
-                            </button>
+                            </flux:button>
                         </div>
                     </div>
                 </div>
             </flux:card.content>
         </flux:card>
     @endif
+
+    <!-- Add this at the bottom of the file -->
+    <flux:modal wire:model="showCredentialsModal" variant="flyout">
+        <form wire:submit.prevent="sendCredentials" class="space-y-6">
+            <flux:heading size="lg">{{ __('Send Access Credentials') }}</flux:heading>
+
+            <div class="space-y-4">
+                <div class="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900">
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>{{ __('Username') }}</span>
+                            <span class="font-mono">{{ $booking->hotspot_username }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>{{ __('Password') }}</span>
+                            <span class="font-mono">{{ $booking->hotspot_password }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <flux:textarea
+                    wire:model="messageText"
+                    label="{{ __('Message') }}"
+                    rows="3"
+                    :error="$errors->first('messageText')"
+                />
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <flux:button type="button" wire:click="$set('showCredentialsModal', false)" variant="outline">
+                    {{ __('Cancel') }}
+                </flux:button>
+                <flux:button type="submit" variant="primary">
+                    {{ __('Send') }}
+                </flux:button>
+            </div>
+        </form>
+    </flux:modal>
+    <x-booking.modals :selected-booking="$selectedBooking" :plans="$plans" :renewalEndedAt="$renewalEndedAt" />
 </div>

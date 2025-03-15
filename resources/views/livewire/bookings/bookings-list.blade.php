@@ -117,30 +117,8 @@
                             </flux:badge>
                         </flux:table.cell>
                         <flux:table.cell>
-                            <div class="flex space-x-2" onclick="event.stopPropagation()">
-                                @if($booking->status->canConfirm())
-                                    <flux:button wire:click="confirmBooking({{ $booking->id }})" size="sm">
-                                        {{ __('Confirm') }}
-                                    </flux:button>
-                                @endif
-
-                                @if($booking->status === \App\Enums\BookingStatus::Confirmed && $booking->balance > 0)
-                                    <flux:button wire:click="confirmBooking({{ $booking->id }})" variant="primary" size="sm">
-                                        {{ __('Pay') }}
-                                    </flux:button>
-                                @endif
-
-                                @if($booking->status->canCancel())
-                                    <flux:button wire:click="cancelBooking({{ $booking->id }})" variant="danger" size="sm">
-                                        {{ __('Cancel') }}
-                                    </flux:button>
-                                @endif
-
-                                @if($booking->status->canRenew())
-                                    <flux:button wire:click="renewBooking({{ $booking->id }})" variant="primary" size="sm">
-                                        {{ __('Renew') }}
-                                    </flux:button>
-                                @endif
+                            <div onclick="event.stopPropagation()">
+                                <x-booking.actions :booking="$booking" />
                             </div>
                         </flux:table.cell>
                     </flux:table.row>
@@ -159,24 +137,42 @@
             @include('flux.pagination', ['paginator' => $bookings])
         </div>
     </div>
+    <livewire:customers.create-customer />
 
-    <!-- Create Booking Modal -->
+    <!-- Inside the Create/Edit Booking Modal -->
     <flux:modal wire:model="showModal" variant="flyout">
         <form wire:submit.prevent="create" class="space-y-6">
-            <flux:heading size="lg">{{ __('Create Booking') }}</flux:heading>
+            <flux:heading size="lg">
+                {{ $bookingId ? __('Edit Booking') : __('Create Booking') }}
+            </flux:heading>
 
-            <flux:select
-                wire:model="customerId"
-                label="{{ __('Customer') }}"
-                required
-                searchable
-                :error="$errors->first('customerId')"
-            >
-                <option value="">{{ __('Select Customer') }}</option>
-                @foreach($customers as $customer)
-                    <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                @endforeach
-            </flux:select>
+            <div class="flex items-end gap-2">
+                <div class="flex-1">
+                    <flux:select
+                        wire:model="customerId"
+                        label="{{ __('Customer') }}"
+                        required
+                        searchable
+                        :error="$errors->first('customerId')"
+                        wire:key="customer-select-{{ count($customers) }}"
+                    >
+                        <option value="">{{ __('Select Customer') }}</option>
+                        @foreach($customers as $customer)
+                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                        @endforeach
+                    </flux:select>
+                </div>
+                <div>
+                    <flux:button
+                        type="button"
+                        wire:click="$dispatch('open-create-customer')"
+                        variant="outline"
+                    >
+                        {{ __('New Customer') }}
+                    </flux:button>
+                </div>
+            </div>
+
 
             <flux:select
                 wire:model="workspaceId"
@@ -243,51 +239,16 @@
                     {{ __('Cancel') }}
                 </flux:button>
                 <flux:button wire:loading.attr="disabled" wire:target="create" type="submit" variant="primary">
-                    <span wire:loading.remove wire:target="create">{{ __('Create') }}</span>
-                    <span wire:loading wire:target="create">{{ __('Creating...') }}</span>
+                    <span wire:loading.remove wire:target="create">
+                        {{ $bookingId ? __('Edit') : __('Create') }}
+                    </span>
+                    <span wire:loading wire:target="create">
+                        {{ $bookingId ? __('Editing ... ') : __('Creating ... ') }}
+                    </span>
                 </flux:button>
             </div>
         </form>
     </flux:modal>
 
-    <!-- Payment Modal -->
-    <flux:modal wire:model="showPaymentModal">
-        <form wire:submit.prevent="processPayment" class="space-y-6">
-            <flux:heading size="lg">{{ __('Process Payment') }}</flux:heading>
-
-            @if($selectedBooking)
-                <div class="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900">
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span>{{ __('Total Amount') }}</span>
-                            <span>{{ number_format($selectedBooking->total, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>{{ __('Balance') }}</span>
-                            <span>{{ number_format($selectedBooking->balance, 2) }}</span>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <flux:input
-                wire:model="paymentAmount"
-                type="number"
-                step="0.01"
-                label="{{ __('Payment Amount') }}"
-                required
-                :error="$errors->first('paymentAmount')"
-            />
-
-            <div class="flex justify-end space-x-2">
-                <flux:button type="button" wire:click="$set('showPaymentModal', false)" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button wire:loading.attr="disabled" wire:target="processPayment" type="submit" variant="primary">
-                    <span wire:loading.remove wire:target="processPayment">{{ __('Process') }}</span>
-                    <span wire:loading wire:target="processPayment">{{ __('Processing...') }}</span>
-                </flux:button>
-            </div>
-        </form>
-    </flux:modal>
+    <x-booking.modals :selected-booking="$selectedBooking" :plans="$plans" :renewalEndedAt="$renewalEndedAt" />
 </div>

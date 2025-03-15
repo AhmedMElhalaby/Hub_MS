@@ -15,7 +15,6 @@ trait WithModal
     public function closeModal()
     {
         $this->showModal = false;
-        $this->resetForm();
     }
 
     public function openDeleteModal()
@@ -26,6 +25,5 @@ trait WithModal
     public function closeDeleteModal()
     {
         $this->showDeleteModal = false;
-        $this->resetForm();
     }
 }

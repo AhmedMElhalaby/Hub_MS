@@ -5,11 +5,18 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-4">
         <x-stat-card
             title="{{ __('Total Income') }}"
             value="{{ number_format($statistics['total_income'], 2) }}"
             description="{{ __('All time income') }}"
+            trend="up"
+            color="success"
+        />
+        <x-stat-card
+            title="{{ __('Total Expected Income') }}"
+            value="{{ number_format($statistics['total_expected_payment'], 2) }}"
+            description="{{ __('Active booking income') }}"
             trend="up"
             color="success"
         />
@@ -30,7 +37,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <flux:input
             wire:model.live="search"
             type="search"
@@ -41,6 +48,13 @@
             <option value="">{{ __('All Types') }}</option>
             @foreach(\App\Enums\FinanceType::cases() as $type)
                 <option value="{{ $type->value }}">{{ $type->label() }}</option>
+            @endforeach
+        </flux:select>
+
+        <flux:select wire:model.live="paymentMethodFilter">
+            <option value="">{{ __('All Payment Methods') }}</option>
+            @foreach(\App\Enums\PaymentMethod::cases() as $method)
+                <option value="{{ $method->value }}">{{ $method->label() }}</option>
             @endforeach
         </flux:select>
 
@@ -82,6 +96,8 @@
                         @endif
                     </button>
                 </flux:table.head>
+                <flux:table.head>{{ __('Payment Method') }}</flux:table.head>
+                <flux:table.head>{{ __('Status') }}</flux:table.head>
                 <flux:table.head>{{ __('Actions') }}</flux:table.head>
             </x-slot:header>
 
@@ -121,6 +137,18 @@
                         <flux:table.cell>{{ number_format($finance->amount, 2) }}</flux:table.cell>
                         <flux:table.cell>{{ $finance->note }}</flux:table.cell>
                         <flux:table.cell>{{ $finance->created_at->format('M d, Y H:i') }}</flux:table.cell>
+                        <flux:table.cell>{{ $finance->payment_method->label() }}</flux:table.cell>
+                        <flux:table.cell>
+                            @if(str_contains($finance->note ?? '', 'Voided:'))
+                                <flux:badge variant="solid" color="red">
+                                    {{ __('Voided') }}
+                                </flux:badge>
+                            @else
+                                <flux:badge variant="solid" color="emerald">
+                                    {{ __('Active') }}
+                                </flux:badge>
+                            @endif
+                        </flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
                                 @if(!str_contains($finance->note ?? '', 'Voided:'))

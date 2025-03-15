@@ -83,4 +83,30 @@ class MikrotikService
 
         return $this->client->query($query)->read();
     }
+
+    public function updateHotspotUser(string $username, array $attributes = []): void
+    {
+        // First, find the user's ID
+        $findQuery = new Query('/ip/hotspot/user/print');
+        $findQuery->where('name', $username);
+        $user = $this->client->query($findQuery)->read();
+
+        if (!empty($user)) {
+            // Update the user using their .id
+            $updateQuery = new Query('/ip/hotspot/user/set');
+            $updateQuery->equal('.id', $user[0]['.id']);
+
+            if (isset($attributes['uptime'])) {
+                $updateQuery->equal('limit-uptime', $attributes['uptime']);
+            }
+            if (isset($attributes['profile'])) {
+                $updateQuery->equal('profile', $attributes['profile']);
+            }
+            if (isset($attributes['bytes_total'])) {
+                $updateQuery->equal('limit-bytes-total', $attributes['bytes_total']);
+            }
+
+            $this->client->query($updateQuery)->read();
+        }
+    }
 }

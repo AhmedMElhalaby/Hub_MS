@@ -22,6 +22,13 @@ class SettingsList extends Component
     public $mikrotikUser;
     public $mikrotikPassword;
     public $mikrotikPort;
+    // Add these properties
+    public $sms_settings = [
+        'sms_enabled' => false,
+        'sms_username' => '',
+        'sms_password' => '',
+        'sms_sender_id' => '',
+    ];
 
     protected $casts = [
         'mikrotikEnabled' => 'boolean',
@@ -36,6 +43,13 @@ class SettingsList extends Component
         $this->mikrotikHost = Setting::get('mikrotik_host');
         $this->mikrotikUser = Setting::get('mikrotik_user');
         $this->mikrotikPort = Setting::get('mikrotik_port', '8728');
+        // Add this to your existing mount method
+        $this->sms_settings = [
+            'sms_enabled' => (bool) Setting::get('sms_enabled', false),
+            'sms_username' => Setting::get('sms_username', ''),
+            'sms_password' => Setting::get('sms_password', ''),
+            'sms_sender_id' => Setting::get('sms_sender_id', ''),
+        ];
     }
 
     public function updatedAppLogo()
@@ -121,5 +135,16 @@ class SettingsList extends Component
     public function render()
     {
         return view('livewire.settings.settings-list');
+    }
+
+    // Add save method for SMS settings
+    public function saveSmsSettings()
+    {
+        foreach ($this->sms_settings as $key => $value) {
+            Setting::set($key, $value);
+        }
+
+        session()->flash('message', __('SMS settings saved successfully.'));
+        $this->redirect(request()->header('Referer'), navigate: true);
     }
 }
