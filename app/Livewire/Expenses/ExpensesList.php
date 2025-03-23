@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Expenses;
 
-use App\Models\Expense;
+use App\Repositories\ExpenseRepository;
+use App\Services\NotificationService;
 use App\Traits\WithModal;
 use App\Traits\WithSorting;
 use App\Enums\ExpenseCategory;
@@ -10,17 +11,22 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Illuminate\Validation\Rules\Enum;
-use App\Enums\FinanceType;
-use App\Models\Finance;
 
 #[Layout('components.layouts.app')]
 class ExpensesList extends Component
 {
-    use WithPagination, WithSorting, WithModal;
+    use WithPagination, WithSorting, WithModal, NotificationService;
 
     public $category = '';
     public $amount = '';
     public $expenseId;
+
+    protected ExpenseRepository $expenseRepository;
+
+    public function boot(ExpenseRepository $expenseRepository)
+    {
+        $this->expenseRepository = $expenseRepository;
+    }
 
     public function create()
     {
@@ -28,28 +34,24 @@ class ExpensesList extends Component
         $this->openModal();
     }
 
-    public function edit(Expense $expense)
+    public function edit($expenseId)
     {
+        $expense = $this->expenseRepository->findById($expenseId);
         $this->expenseId = $expense->id;
         $this->category = $expense->category->value;
         $this->amount = $expense->amount;
         $this->openModal();
     }
 
-    public function confirmDelete(Expense $expense)
+    public function confirmDelete($expenseId)
     {
-        $this->expenseId = $expense->id;
-        $expense->finances()->delete();
+        $this->expenseId = $expenseId;
         $this->openDeleteModal();
     }
 
     public function resetForm()
     {
-        $this->reset([
-            'expenseId',
-            'category',
-            'amount',
-        ]);
+        $this->reset(['expenseId', 'category', 'amount']);
     }
 
     public function save()
@@ -59,51 +61,40 @@ class ExpensesList extends Component
             'amount' => 'required|numeric|min:0',
         ]);
 
-        if ($this->expenseId) {
-            Expense::findOrFail($this->expenseId)->update($validated);
-            Finance::updateOrCreate(
-                ['expense_id' => $this->expenseId],
-                [
-                    'amount' => $validated['amount'],
-                    'type' => FinanceType::Expense,
-                    'note' => @$validated['note']
-                ]
-            );
-        } else {
-            $Expense = Expense::create($validated);
-            $Expense->finances()->create([
-                'amount' => $Expense->amount,
-                'type' => FinanceType::Expense,
-                'note' => $Expense->note
-            ]);
-        }
+        try {
+            if ($this->expenseId) {
+                $this->expenseRepository->update($this->expenseId, $validated);
+            } else {
+                $this->expenseRepository->create($validated);
+            }
 
-        session()->flash('message', __('Expense saved successfully.'));
-        $this->closeModal();
-        $this->redirect(request()->header('Referer'), navigate: true);
+            $this->notifySuccess('messages.expense.saved');
+            $this->closeModal();
+        } catch (\Exception $e) {
+            $this->notifyError('messages.expense.save_error');
+        }
     }
 
     public function delete()
     {
         try {
-            $expense = Expense::findOrFail($this->expenseId);
-            $expense->delete();
-            session()->flash('message', __('Expense deleted successfully.'));
+            $this->expenseRepository->delete($this->expenseId);
+            $this->notifySuccess('messages.expense.deleted');
             $this->closeDeleteModal();
         } catch (\Exception $e) {
-            session()->flash('error', __('An error occurred while deleting the expense.'));
+            $this->notifyError('messages.expense.delete_error');
         }
-        $this->redirect(request()->header('Referer'), navigate: true);
     }
 
     public function render()
     {
         return view('livewire.expenses.expenses-list', [
-            'expenses' => Expense::when($this->search, function($query) {
-                $query->where('category', 'like', '%'.$this->search.'%');
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage),
+            'expenses' => $this->expenseRepository->getAllPaginated(
+                $this->search,
+                $this->sortField,
+                $this->sortDirection,
+                $this->perPage
+            ),
             'categories' => ExpenseCategory::cases()
         ]);
     }

@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Customers;
 
-use App\Models\Customer;
+use App\Repositories\CustomerRepository;
+use App\Services\NotificationService;
 use App\Traits\WithModal;
 use App\Traits\WithSorting;
 use Livewire\Component;
@@ -13,49 +14,49 @@ use Livewire\Attributes\Layout;
 #[Layout('components.layouts.app')]
 class CustomersList extends Component
 {
-    use WithPagination, WithSorting, WithModal;
+    use WithPagination, WithSorting, WithModal, NotificationService;
 
     public $customerId;
     public $specializationFilter = '';
+
+    protected CustomerRepository $customerRepository;
+
+    public function boot(CustomerRepository $customerRepository)
+    {
+        $this->customerRepository = $customerRepository;
+    }
 
     public function edit($customerId)
     {
         $this->dispatch('edit-customer', customerId: $customerId);
     }
 
-    public function confirmDelete(Customer $customer)
+    public function confirmDelete($customerId)
     {
-        $this->customerId = $customer->id;
+        $this->customerId = $customerId;
         $this->openDeleteModal();
     }
 
     public function delete()
     {
         try {
-            $customer = Customer::findOrFail($this->customerId);
-            $customer->delete();
-            session()->flash('message', __('Customer deleted successfully.'));
+            $this->customerRepository->delete($this->customerId);
+            $this->notifySuccess('messages.customer.deleted');
             $this->closeDeleteModal();
         } catch (\Exception $e) {
-            dd($e);
-            session()->flash('error', __('An error occurred while deleting the customer.'));
+            $this->notifyError('messages.customer.delete_error');
         }
-        $this->redirect(request()->header('Referer'), navigate: true);
     }
 
     public function render()
     {
         return view('livewire.customers.customers-list', [
-            'customers' => Customer::when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%')
-                    ->orWhere('mobile', 'like', '%' . $this->search . '%');
-            })
-                ->when($this->specializationFilter, function ($query) {
-                    $query->where('specialization', $this->specializationFilter);
-                })
-                ->orderBy($this->sortField, $this->sortDirection)
-                ->paginate($this->perPage),
+            'customers' => $this->customerRepository->getAllPaginated(
+                $this->search,
+                $this->sortField,
+                $this->sortDirection,
+                $this->perPage
+            ),
             'specializations' => Specialization::cases()
         ]);
     }

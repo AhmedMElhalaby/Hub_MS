@@ -1,0 +1,56 @@
+<?php
+
+return [
+    'user' => [
+        'saved' => 'User saved successfully.',
+        'deleted' => 'User deleted successfully.',
+        'delete_error' => 'An error occurred while deleting the user.',
+        'not_found' => 'User not found.',
+    ],
+    'customer' => [
+        'saved' => 'Customer saved successfully.',
+        'created' => 'Customer created successfully.',
+        'updated' => 'Customer updated successfully.',
+        'deleted' => 'Customer deleted successfully.',
+        'delete_error' => 'An error occurred while deleting the customer.',
+        'save_error' => 'An error occurred while saving the customer.',
+        'not_found' => 'Customer not found.',
+    ],
+    'workspace' => [
+        'saved' => 'Workspace saved successfully.',
+        'deleted' => 'Workspace deleted successfully.',
+        'delete_error' => 'An error occurred while deleting the workspace.',
+        'save_error' => 'An error occurred while saving the workspace.',
+        'not_found' => 'Workspace not found.',
+    ],
+    'plan' => [
+        'saved' => 'Plan saved successfully.',
+        'deleted' => 'Plan deleted successfully.',
+        'delete_error' => 'An error occurred while deleting the plan.',
+        'save_error' => 'An error occurred while saving the plan.',
+        'not_found' => 'Plan not found.',
+    ],
+    'expense' => [
+        'saved' => 'Expense saved successfully.',
+        'deleted' => 'Expense deleted successfully.',
+        'delete_error' => 'An error occurred while deleting the expense.',
+        'save_error' => 'An error occurred while saving the expense.',
+        'not_found' => 'Expense not found.',
+    ],
+    'booking' => [
+        'created' => 'Booking created successfully.',
+        'updated' => 'Booking updated successfully.',
+        'confirmed' => 'Booking confirmed successfully.',
+        'cancelled' => 'Booking cancelled successfully.',
+        'renewed' => 'Booking renewed successfully.',
+        'payment_processed' => 'Payment processed successfully.',
+        'save_error' => 'Failed to save booking.',
+        'confirm_error' => 'Failed to confirm booking.',
+        'cancel_error' => 'Failed to cancel booking.',
+        'payment_error' => 'Failed to process payment.',
+        'renew_error' => 'Failed to renew booking.',
+        'not_found' => 'Booking not found.',
+        'credentials_sent' => 'Credentials sent successfully.',
+        'credentials_send_error' => 'Failed to send credentials.',
+    ],
+];

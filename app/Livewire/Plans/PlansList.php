@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Plans;
 
-use App\Models\Plan;
+use App\Repositories\PlanRepository;
+use App\Services\NotificationService;
 use App\Traits\WithModal;
 use App\Traits\WithSorting;
 use App\Enums\PlanType;
@@ -17,7 +18,7 @@ use Illuminate\Validation\Rules\Enum;
 #[Layout('components.layouts.app')]
 class PlansList extends Component
 {
-    use WithPagination, WithSorting, WithModal;
+    use WithPagination, WithSorting, WithModal, NotificationService;
 
     public $type = '';
     public $price = '';
@@ -26,6 +27,13 @@ class PlansList extends Component
     public $availableProfiles = [];
     public $types = [];
     public $planId;
+
+    protected PlanRepository $planRepository;
+
+    public function boot(PlanRepository $planRepository)
+    {
+        $this->planRepository = $planRepository;
+    }
 
     public function mount()
     {
@@ -51,29 +59,25 @@ class PlansList extends Component
         $this->openModal();
     }
 
-    public function edit(Plan $plan)
+    public function edit($planId)
     {
+        $plan = $this->planRepository->findById($planId);
         $this->planId = $plan->id;
         $this->type = $plan->type->value;
         $this->price = $plan->price;
-        $this->mikrotik_profile = $this->mikrotik_profile;
+        $this->mikrotik_profile = $plan->mikrotik_profile;
         $this->openModal();
     }
 
-    public function confirmDelete(Plan $plan)
+    public function confirmDelete($planId)
     {
-        $this->planId = $plan->id;
+        $this->planId = $planId;
         $this->openDeleteModal();
     }
 
     public function resetForm()
     {
-        $this->reset([
-            'planId',
-            'type',
-            'price',
-            'mikrotik_profile'
-        ]);
+        $this->reset(['planId', 'type', 'price', 'mikrotik_profile']);
     }
 
     public function save()
@@ -84,38 +88,40 @@ class PlansList extends Component
             'mikrotik_profile' => 'nullable|string'
         ]);
 
-        if ($this->planId) {
-            Plan::findOrFail($this->planId)->update($validated);
-        } else {
-            Plan::create($validated);
-        }
+        try {
+            if ($this->planId) {
+                $this->planRepository->update($this->planId, $validated);
+            } else {
+                $this->planRepository->create($validated);
+            }
 
-        session()->flash('message', __('Plan saved successfully.'));
-        $this->closeModal();
-        $this->redirect(request()->header('Referer'), navigate: true);
+            $this->notifySuccess('messages.plan.saved');
+            $this->closeModal();
+        } catch (\Exception $e) {
+            $this->notifyError('messages.plan.save_error');
+        }
     }
 
     public function delete()
     {
         try {
-            $plan = Plan::findOrFail($this->planId);
-            $plan->delete();
-            session()->flash('message', __('Plan deleted successfully.'));
+            $this->planRepository->delete($this->planId);
+            $this->notifySuccess('messages.plan.deleted');
             $this->closeDeleteModal();
         } catch (\Exception $e) {
-            session()->flash('error', __('An error occurred while deleting the plan.'));
+            $this->notifyError('messages.plan.delete_error');
         }
-        $this->redirect(request()->header('Referer'), navigate: true);
     }
 
     public function render()
     {
         return view('livewire.plans.plans-list', [
-            'plans' => Plan::query()
-                ->when(!$this->mikrotikEnabled, function ($query) {
-                    $query->where('mikrotik_profile', null);
-                })
-                ->paginate(10)
+            'plans' => $this->planRepository->getAllPaginatedWithMikrotik(
+                $this->search,
+                $this->sortField,
+                $this->sortDirection,
+                $this->perPage
+            )
         ]);
     }
 }

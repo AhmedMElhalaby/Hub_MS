@@ -49,7 +49,7 @@
                             @foreach($plan->bookings as $booking)
                                 <flux:table.row>
                                     <flux:table.cell>{{ $booking->customer->name }}</flux:table.cell>
-                                    <flux:table.cell>{{ $booking->start_time->format('M d, Y') }}</flux:table.cell>
+                                    <flux:table.cell>{{ $booking->started_at->format('M d, Y') }}</flux:table.cell>
                                     <flux:table.cell>
                                         <flux:badge>{{ $booking->status }}</flux:badge>
                                     </flux:table.cell>

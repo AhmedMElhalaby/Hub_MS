@@ -90,6 +90,14 @@
                         @endif
                     </button>
                 </flux:table.head>
+                <flux:table.head>
+                    <button wire:click="sortBy('ended_at')" class="flex items-center space-x-1">
+                        <span>{{ __('Time Left') }}</span>
+                        @if ($sortField === 'ended_at')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="size-4" />
+                        @endif
+                    </button>
+                </flux:table.head>
                 <flux:table.head>{{ __('Actions') }}</flux:table.head>
             </x-slot:header>
 
@@ -115,6 +123,13 @@
                             <flux:badge variant="solid" :color="$booking->status->color()">
                                 {{ $booking->status->label() }}
                             </flux:badge>
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            @if($booking->ended_at->isPast())
+                                <flux:badge variant="solid" color="danger">{{ __('Expired') }}</flux:badge>
+                            @else
+                                {{ $booking->ended_at->diffForHumans(['parts' => 2]) }}
+                            @endif
                         </flux:table.cell>
                         <flux:table.cell>
                             <div onclick="event.stopPropagation()">

@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Users;
 
-use App\Models\User;
+use App\Repositories\UserRepository;
+use App\Services\NotificationService;
 use App\Traits\WithModal;
 use App\Traits\WithSorting;
 use Livewire\Component;
@@ -12,12 +13,19 @@ use Livewire\Attributes\Layout;
 #[Layout('components.layouts.app')]
 class UsersList extends Component
 {
-    use WithPagination, WithSorting, WithModal;
+    use WithPagination, WithSorting, WithModal, NotificationService;
 
     public $name = '';
     public $email = '';
     public $password = '';
     public $userId;
+
+    protected UserRepository $userRepository;
+
+    public function boot(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
 
     public function create()
     {
@@ -25,28 +33,24 @@ class UsersList extends Component
         $this->openModal();
     }
 
-    public function edit(User $user)
+    public function edit($userId)
     {
+        $user = $this->userRepository->findById($userId);
         $this->userId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
         $this->openModal();
     }
 
-    public function confirmDelete(User $user)
+    public function confirmDelete($userId)
     {
-        $this->userId = $user->id;
+        $this->userId = $userId;
         $this->openDeleteModal();
     }
 
     public function resetForm()
     {
-        $this->reset([
-            'userId',
-            'name',
-            'email',
-            'password',
-        ]);
+        $this->reset(['userId', 'name', 'email', 'password']);
     }
 
     public function save()
@@ -57,51 +61,45 @@ class UsersList extends Component
             'password' => $this->userId ? 'nullable|min:8' : 'required|min:8',
         ]);
 
-        if ($this->userId) {
-            $user = User::findOrFail($this->userId);
-            $user->update([
-                'name' => $this->name,
-                'email' => $this->email,
-            ]);
+        $data = [
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
 
-            if ($this->password) {
-                $user->update(['password' => bcrypt($this->password)]);
-            }
-        } else {
-            User::create([
-                'name' => $this->name,
-                'email' => $this->email,
-                'password' => bcrypt($this->password),
-            ]);
+        if ($this->password) {
+            $data['password'] = $this->password;
         }
 
-        session()->flash('message', __('User saved successfully.'));
+        if ($this->userId) {
+            $this->userRepository->update($this->userId, $data);
+        } else {
+            $this->userRepository->create($data);
+        }
+
+        $this->notifySuccess('messages.user.saved');
         $this->closeModal();
-        $this->redirect(request()->header('Referer'), navigate: true);
     }
 
     public function delete()
     {
         try {
-            $user = User::findOrFail($this->userId);
-            $user->delete();
-            session()->flash('message', __('User deleted successfully.'));
+            $this->userRepository->delete($this->userId);
+            $this->notifySuccess('messages.user.deleted');
             $this->closeDeleteModal();
         } catch (\Exception $e) {
-            session()->flash('error', __('An error occurred while deleting the user.'));
+            $this->notifyError('messages.user.delete_error');
         }
-        $this->redirect(request()->header('Referer'), navigate: true);
     }
 
     public function render()
     {
         return view('livewire.users.users-list', [
-            'users' => User::when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
-            })
-                ->orderBy($this->sortField, $this->sortDirection)
-                ->paginate($this->perPage),
+            'users' => $this->userRepository->getAllPaginated(
+                $this->search,
+                $this->sortField,
+                $this->sortDirection,
+                $this->perPage
+            ),
         ]);
     }
 }

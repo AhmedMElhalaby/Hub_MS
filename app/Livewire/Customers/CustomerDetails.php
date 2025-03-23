@@ -3,17 +3,32 @@
 namespace App\Livewire\Customers;
 
 use App\Models\Customer;
+use App\Repositories\CustomerRepository;
+use App\Services\NotificationService;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
 #[Layout('components.layouts.app')]
 class CustomerDetails extends Component
 {
-    public Customer $customer;
+    use NotificationService;
+
+    public $customer;
+    protected CustomerRepository $customerRepository;
+
+    public function boot(CustomerRepository $customerRepository)
+    {
+        $this->customerRepository = $customerRepository;
+    }
 
     public function mount(Customer $customer)
     {
-        $this->customer = $customer->load(['bookings.finances']);
+        try {
+            $this->customer = $this->customerRepository->findWithBookings($customer->id);
+        } catch (\Exception $e) {
+            $this->notifyError('messages.customer.not_found');
+            return $this->redirect(route('customers.index'));
+        }
     }
 
     public function getTotalPaymentsProperty()

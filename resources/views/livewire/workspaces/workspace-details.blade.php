@@ -51,7 +51,7 @@
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="text-sm font-medium">{{ $booking->customer->name }}</p>
-                                    <p class="text-sm text-gray-500">{{ $booking->start_time->format('M d, Y H:i') }}</p>
+                                    <p class="text-sm text-gray-500">{{ $booking->started_at->format('M d, Y H:i') }}</p>
                                 </div>
                                 <flux:badge>{{ $booking->status }}</flux:badge>
                             </div>

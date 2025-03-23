@@ -2,27 +2,52 @@
 
 namespace App\Livewire\Bookings;
 
-use App\Models\Booking;
 use App\Models\Plan;
+use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Workspace;
+use App\Repositories\BookingRepository;
+use App\Services\NotificationService;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Traits\HasBookingActions;
-use \Illuminate\Support\Facades\Log;
 
 #[Layout('components.layouts.app')]
 class BookingDetails extends Component
 {
-    use HasBookingActions;
+    use HasBookingActions, NotificationService;
 
-    public Booking $booking;
+    public $booking;
     public $plans;
     public $customers;
     public $workspaces;
     public $showCredentialsModal = false;
     public $messageText;
     public $selectedBooking;
+
+    protected BookingRepository $bookingRepository;
+
+    public function boot(BookingRepository $bookingRepository)
+    {
+        $this->bookingRepository = $bookingRepository;
+    }
+
+    public function mount(Booking $booking)
+    {
+        try {
+            $this->booking = $this->bookingRepository->findWithRelations($booking->id);
+            $this->selectedBooking = $this->booking;
+            $this->plans = Plan::all();
+            $this->customers = Customer::all();
+            $this->workspaces = Workspace::all();
+            $this->messageText = __(
+                "Internet access:\nU: :username\nP: :password"
+            );
+        } catch (\Exception $e) {
+            $this->notifyError('messages.booking.not_found');
+            return $this->redirect(route('bookings.index'));
+        }
+    }
 
     public function sendCredentials()
     {
@@ -36,36 +61,17 @@ class BookingDetails extends Component
                 [$this->booking->hotspot_username, $this->booking->hotspot_password],
                 $this->messageText
             );
-            // Send message using your messaging service
-            $this->booking->customer->sendMessage($message);
 
+            $this->booking->customer->sendMessage($message);
             $this->booking->logEvent('Credentials Sent', [
                 'sent_by' => auth()->user()->name
             ]);
 
+            $this->notifySuccess('messages.booking.credentials_sent');
             $this->showCredentialsModal = false;
-            session()->flash('message', __('Credentials sent successfully.'));
-            $this->redirect(request()->header('Referer'), navigate: true);
         } catch (\Exception $e) {
-            session()->flash('error', __('Failed to send credentials.'));
-            Log::error('Failed to send credentials', [
-                'booking_id' => $this->booking->id,
-                'error' => $e->getMessage()
-            ]);
-            $this->redirect(request()->header('Referer'), navigate: true);
+            $this->notifyError('messages.booking.credentials_send_error');
         }
-    }
-
-    public function mount(Booking $booking)
-    {
-        $this->booking = $booking;
-        $this->selectedBooking = $booking;
-        $this->plans = Plan::all();
-        $this->customers = Customer::all();
-        $this->workspaces = Workspace::all();
-        $this->messageText = __(
-            "Internet access:\nU: :username\nP: :password"
-        );
     }
 
     public function render()

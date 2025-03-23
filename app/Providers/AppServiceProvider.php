@@ -2,10 +2,18 @@
 
 namespace App\Providers;
 
+use App\Repositories\CustomerRepository;
 use App\Services\SmsService;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Illuminate\Support\Facades\Notification;
+use App\Repositories\Interfaces\EloquentRepositoryInterface;
+use App\Repositories\UserRepository;
+use App\Repositories\WorkspaceRepository;
+use App\Repositories\PlanRepository;
+use App\Repositories\ExpenseRepository;
+use App\Repositories\BookingRepository;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -13,7 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(EloquentRepositoryInterface::class,CustomerRepository::class);
+        $this->app->bind(EloquentRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(EloquentRepositoryInterface::class, WorkspaceRepository::class);
+        $this->app->bind(EloquentRepositoryInterface::class, PlanRepository::class);
+        $this->app->bind(EloquentRepositoryInterface::class, ExpenseRepository::class);
+        $this->app->bind(EloquentRepositoryInterface::class, BookingRepository::class);
     }
 
     /**

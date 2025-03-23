@@ -3,17 +3,32 @@
 namespace App\Livewire\Users;
 
 use App\Models\User;
+use App\Repositories\UserRepository;
+use App\Services\NotificationService;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
 #[Layout('components.layouts.app')]
 class UserDetails extends Component
 {
-    public User $user;
+    use NotificationService;
+
+    public $user;
+    protected UserRepository $userRepository;
+
+    public function boot(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
 
     public function mount(User $user)
     {
-        $this->user = $user;
+        try {
+            $this->user = $this->userRepository->findById($user->id);
+        } catch (\Exception $e) {
+            $this->notifyError('messages.user.not_found');
+            return $this->redirect(route('users.index'));
+        }
     }
 
     public function render()

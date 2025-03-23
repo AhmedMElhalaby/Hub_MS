@@ -109,4 +109,35 @@ class MikrotikService
             $this->client->query($updateQuery)->read();
         }
     }
+
+    /**
+     * Reset user counters in Mikrotik hotspot
+     */
+    public function resetUserCounters(string $username): void
+    {
+        try {
+
+            // Find the user first
+            $query = new Query('/ip/hotspot/user/print');
+            $query->where('name', $username);
+            $users = $this->client->query($query)->read();
+
+            if (empty($users)) {
+                throw new \Exception("Hotspot user not found: {$username}");
+            }
+
+            // Reset the user's counters
+            $userId = $users[0]['.id'];
+            $resetQuery = new Query('/ip/hotspot/user/reset-counters');
+            $resetQuery->equal('numbers', $userId);
+            $this->client->query($resetQuery)->read();
+
+        } catch (\Exception $e) {
+            throw new \Exception("Failed to reset hotspot user counters: {$e->getMessage()}");
+        } finally {
+            if (isset($client)) {
+                $client->disconnect();
+            }
+        }
+    }
 }

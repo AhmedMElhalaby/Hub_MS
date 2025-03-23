@@ -1,35 +1,28 @@
-<div class="fixed top-4 left-4 w-96 z-20 space-y-2 mt-3 ml-3">
-    @foreach ($notifications as $notification)
-        <div wire:key="{{ $notification['id'] }}" x-data="{ show: true }" x-show="show"
-            {{-- x-init="setTimeout(() => { show = false; $wire.remove('{{ $notification['id'] }}') }, 3000)" --}}
-            x-transition:enter="transform ease-out duration-300 transition"
-            x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-            x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
-            x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg shadow-lg dark:bg-zinc-800 {{ $notification['type'] === 'success' ? 'bg-white border border-green-100' : 'bg-white border border-red-100' }}">
-            <div class="p-4">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        @if ($notification['type'] === 'success')
-                            <flux:icon name="check-circle" class="size-5 text-green-500" />
-                        @else
-                            <flux:icon name="x-circle" class="size-5 text-red-500" />
-                        @endif
-                    </div>
-                    <div class="ml-3 w-0 flex-1">
-                        <p
-                            class="{{ $notification['type'] === 'success' ? 'text-green-900 dark:text-green-400' : 'text-red-900 dark:text-red-400' }} text-sm font-medium">
-                            {{ $notification['message'] }}
-                        </p>
-                    </div>
-                    <div class="ml-4 flex flex-shrink-0">
-                        <button @click="show = false; $wire.remove('{{ $notification['id'] }}')"
-                            class="{{ $notification['type'] === 'success' ? 'text-green-500 hover:text-green-600' : 'text-red-500 hover:text-red-600' }} transition-colors">
-                            <flux:icon name="x-mark" class="size-4" />
-                        </button>
-                    </div>
-                </div>
+<div class="fixed top-4 left-4 z-50 space-y-4">
+    @foreach($notifications as $notification)
+        <div
+            x-data="{ show: true }"
+            x-show="show"
+            x-init="setTimeout(() => { show = false; $wire.remove('{{ $notification['id'] }}') }, 3000)"
+            class="notification-{{ $notification['type'] }} rounded-lg p-4 flex items-center shadow-lg max-w-sm dark:bg-gray-800"
+            role="alert"
+        >
+            <div class="flex-shrink-0">
+                @if($notification['type'] === 'success')
+                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                @endif
+                @if($notification['type'] === 'error')
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                @endif
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {{ $notification['message'] }}
+                </p>
             </div>
         </div>
     @endforeach

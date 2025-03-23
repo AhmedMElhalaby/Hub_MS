@@ -2,16 +2,16 @@
 
 namespace App\Livewire\Customers;
 
-use App\Models\Customer;
+use App\Repositories\CustomerRepository;
+use App\Services\NotificationService;
 use Livewire\Component;
 use App\Traits\WithModal;
-use Illuminate\Support\Facades\DB;
 use App\Enums\Specialization;
 use Livewire\Attributes\On;
 
 class CreateCustomer extends Component
 {
-    use WithModal;
+    use WithModal, NotificationService;
 
     public $customerId = null;
     public $name = '';
@@ -21,10 +21,17 @@ class CreateCustomer extends Component
     public $specialization = '';
     public $showModal = false;
 
+    protected CustomerRepository $customerRepository;
+
+    public function boot(CustomerRepository $customerRepository)
+    {
+        $this->customerRepository = $customerRepository;
+    }
+
     #[On('edit-customer')]
     public function edit($customerId)
     {
-        $customer = Customer::find($customerId);
+        $customer = $this->customerRepository->findById($customerId);
         $this->customerId = $customer->id;
         $this->name = $customer->name;
         $this->email = $customer->email;
@@ -45,27 +52,20 @@ class CreateCustomer extends Component
         ]);
 
         try {
-            DB::beginTransaction();
-
             if ($this->customerId) {
-                $customer = Customer::find($this->customerId);
-                $customer->update($validated);
+                $customer = $this->customerRepository->update($this->customerId, $validated);
             } else {
-                $customer = Customer::create($validated);
+                $customer = $this->customerRepository->create($validated);
             }
-
-            DB::commit();
 
             $this->dispatch('customer-created', customerId: $customer->id);
             $this->reset();
             $this->showModal = false;
 
-            session()->flash('message', __('Customer ' . ($this->customerId ? 'updated' : 'created') . ' successfully.'));
+            $this->notifySuccess('messages.customer.' . ($this->customerId ? 'updated' : 'created'));
         } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', __('Failed to save customer.'));
+            $this->notifyError('messages.customer.save_error');
         }
-        $this->redirect(request()->header('Referer'), navigate: true);
     }
 
     public function render()
