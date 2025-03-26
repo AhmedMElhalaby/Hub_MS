@@ -2,107 +2,103 @@
 
 namespace App\Traits;
 
-use App\Enums\BookingStatus;
-use App\Enums\FinanceType;
-use App\Jobs\UpdateHotspotUser;
-use App\Models\Booking;
+use App\Enums\PaymentMethod;
 use App\Models\Plan;
+use App\Repositories\BookingRepository;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\NotificationService;
 
 trait HasBookingActions
 {
+    use NotificationService;
+
+    protected BookingRepository $bookingRepository;
+
     public $showPaymentModal = false;
     public $showRenewalModal = false;
     public $selectedBooking;
     public $paymentAmount;
+    public $paymentMethod;
     public $renewalPlanId;
     public $renewalStartedAt;
     public $renewalDuration = 1;
     public $renewalEndedAt;
 
+    public function bootHasBookingActions(BookingRepository $bookingRepository)
+    {
+        $this->bookingRepository = $bookingRepository;
+    }
+
     public function showPayment($bookingId)
     {
-        $this->selectedBooking = Booking::find($bookingId);
+        $this->selectedBooking = $this->bookingRepository->findWithRelations($bookingId);
         $this->paymentAmount = $this->selectedBooking->balance;
+        $this->paymentMethod = PaymentMethod::Cash->value;
         $this->showPaymentModal = true;
     }
 
     public function confirmBooking($bookingId)
     {
-        $booking = Booking::find($bookingId);
-        $booking->update(['status' => BookingStatus::Confirmed]);
-        $booking->logEvent('Confirmed');
-        session()->flash('message', __('Booking confirmed successfully.'));
+        try {
+            $this->bookingRepository->confirm($bookingId);
+            $this->notifySuccess('messages.booking.confirmed');
+        } catch (\Exception $e) {
+            $this->notifyError('messages.booking.confirm_error');
+            Log::error('Booking confirmation failed', [
+                'booking_id' => $bookingId,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function processPayment()
     {
         $this->validate([
             'paymentAmount' => 'required|numeric|min:0|max:' . $this->selectedBooking->balance,
+            'paymentMethod' => 'required|in:' . implode(',', array_column(PaymentMethod::cases(), 'value')),
         ]);
 
         try {
-            DB::beginTransaction();
+            $this->bookingRepository->addPayment(
+                $this->selectedBooking->id,
+                $this->paymentAmount,
+                $this->paymentMethod
+            );
 
-            $this->selectedBooking->update([
-                'balance' => $this->selectedBooking->balance - $this->paymentAmount,
-            ]);
-
-            $this->selectedBooking->finances()->create([
-                'amount' => $this->paymentAmount,
-                'type' => FinanceType::Income,
-            ]);
-
-            DB::commit();
             $this->showPaymentModal = false;
-            session()->flash('message', __('Payment processed successfully.'));
+            $this->notifySuccess('messages.booking.payment_processed');
         } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', __('Failed to process payment.'));
+            $this->notifyError('messages.booking.payment_error');
             Log::error('Payment processing failed', [
                 'booking_id' => $this->selectedBooking->id,
                 'error' => $e->getMessage()
             ]);
         }
-
-        $this->selectedBooking->logEvent('Payment', [
-            'amount' => $this->paymentAmount,
-            'remaining_balance' => $this->selectedBooking->balance,
-        ]);
     }
 
     public function cancelBooking($bookingId)
     {
-        $booking = Booking::find($bookingId);
         try {
-            DB::beginTransaction();
-
-            $booking->update(['status' => BookingStatus::Cancelled]);
-            $booking->workspace->markAsAvailable();
-
-            DB::commit();
-            session()->flash('message', __('Booking cancelled successfully.'));
+            $this->bookingRepository->cancel($bookingId);
+            $this->notifySuccess('messages.booking.cancelled');
         } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', __('Failed to cancel booking.'));
+            $this->notifyError('messages.booking.cancel_error');
             Log::error('Booking cancellation failed', [
-                'booking_id' => $booking->id,
+                'booking_id' => $bookingId,
                 'error' => $e->getMessage()
             ]);
         }
-
-        $booking->logEvent('Cancelled');
     }
 
     public function renewBooking($bookingId)
     {
-        $this->selectedBooking = Booking::find($bookingId);
+        $this->selectedBooking = $this->bookingRepository->findWithRelations($bookingId);
         $this->renewalPlanId = $this->selectedBooking->plan_id;
         $this->renewalStartedAt = now()->format('Y-m-d\TH:i');
         $this->renewalDuration = 1;
         $this->showRenewalModal = true;
+        $this->calculateRenewalEndDate();
     }
 
     public function updatedRenewalStartedAt()
@@ -120,56 +116,31 @@ trait HasBookingActions
         $this->validate([
             'renewalPlanId' => 'required|exists:plans,id',
             'renewalStartedAt' => 'required|date',
-            'renewalDuration' => 'required|numeric|min:1',
+            'renewalEndedAt' => 'required|date|after:renewalStartedAt',
         ]);
 
         try {
-            DB::beginTransaction();
-
             $plan = Plan::find($this->renewalPlanId);
-            $startDate = \Carbon\Carbon::parse($this->renewalStartedAt);
-            $endDate = $startDate->copy()->addDays($this->renewalDuration);
+            $newCost = $plan->price * $this->renewalDuration;
 
-            // Update existing booking instead of creating new one
-            $this->selectedBooking->update([
+            $this->bookingRepository->renew($this->selectedBooking->id, [
                 'plan_id' => $this->renewalPlanId,
-                'started_at' => $startDate,
-                'ended_at' => $endDate,
-                'total' => $this->selectedBooking->total + ($plan->price * $this->renewalDuration),
-                'balance' => $this->selectedBooking->balance + ($plan->price * $this->renewalDuration),
-                'status' => BookingStatus::Confirmed,
+                'started_at' => $this->renewalStartedAt,
+                'ended_at' => $this->renewalEndedAt,
+                'additional_cost' => $newCost,
             ]);
-
-            // Update Mikrotik user with accumulated time
-            UpdateHotspotUser::dispatch($this->selectedBooking);
-
-            $this->selectedBooking->logEvent('Renewed', [
-                'plan' => $plan->title,
-                'duration' => $this->renewalDuration,
-                'previous_end_date' => $this->selectedBooking->ended_at,
-                'new_end_date' => $endDate,
-            ]);
-
-            DB::commit();
             $this->showRenewalModal = false;
-            session()->flash('message', __('Booking renewed successfully.'));
-
-            return redirect()->route('bookings.show', $this->selectedBooking);
+            $this->notifySuccess('messages.booking.renewed');
         } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', __('Failed to renew booking.'));
-            Log::error('Booking renewal failed', [
-                'booking_id' => $this->selectedBooking->id,
-                'error' => $e->getMessage()
-            ]);
+            $this->notifyError('messages.booking.renew_error');
         }
     }
 
     protected function calculateRenewalEndDate()
     {
         if ($this->renewalStartedAt && $this->renewalDuration) {
-            $startDate = \Carbon\Carbon::parse($this->renewalStartedAt);
-            $this->renewalEndedAt = $startDate->copy()->addDays($this->renewalDuration)->format('Y-m-d\TH:i');
+            $startDate = Carbon::parse($this->renewalStartedAt);
+            $this->renewalEndedAt = $startDate->copy()->addDays((int) $this->renewalDuration)->format('Y-m-d\TH:i');
         }
     }
 }

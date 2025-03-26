@@ -10,7 +10,6 @@ use App\Services\NotificationService;
 use App\Traits\WithModal;
 use App\Enums\BookingStatus;
 use App\Enums\PlanType;
-use App\Enums\PaymentMethod;
 use App\Models\Booking;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -230,71 +229,71 @@ class BookingsList extends Component
         }
     }
 
-    public function confirmBooking($bookingId)
-    {
-        try {
-            $this->bookingRepository->confirm($bookingId);
-            $this->notifySuccess('messages.booking.confirmed');
-        } catch (\Exception $e) {
-            $this->notifyError('messages.booking.confirm_error');
-        }
-    }
+    // public function confirmBooking($bookingId)
+    // {
+    //     try {
+    //         $this->bookingRepository->confirm($bookingId);
+    //         $this->notifySuccess('messages.booking.confirmed');
+    //     } catch (\Exception $e) {
+    //         $this->notifyError('messages.booking.confirm_error');
+    //     }
+    // }
 
-    public function processPayment()
-    {
-        $this->validate([
-            'paymentAmount' => 'required|numeric|min:0|max:' . $this->selectedBooking->balance,
-            'paymentMethod' => 'required|numeric|in:' . implode(',', array_column(PaymentMethod::cases(), 'value')),
-        ]);
+    // public function processPayment()
+    // {
+    //     $this->validate([
+    //         'paymentAmount' => 'required|numeric|min:0|max:' . $this->selectedBooking->balance,
+    //         'paymentMethod' => 'required|numeric|in:' . implode(',', array_column(PaymentMethod::cases(), 'value')),
+    //     ]);
 
-        try {
-            $this->bookingRepository->addPayment(
-                $this->selectedBooking->id,
-                $this->paymentAmount,
-                $this->paymentMethod
-            );
-            $this->showPaymentModal = false;
-            $this->notifySuccess('messages.booking.payment_processed');
-        } catch (\Exception $e) {
-            $this->notifyError('messages.booking.payment_error');
-        }
-    }
+    //     try {
+    //         $this->bookingRepository->addPayment(
+    //             $this->selectedBooking->id,
+    //             $this->paymentAmount,
+    //             $this->paymentMethod
+    //         );
+    //         $this->showPaymentModal = false;
+    //         $this->notifySuccess('messages.booking.payment_processed');
+    //     } catch (\Exception $e) {
+    //         $this->notifyError('messages.booking.payment_error');
+    //     }
+    // }
 
-    public function cancelBooking($bookingId)
-    {
-        try {
-            $this->bookingRepository->cancel($bookingId);
-            $this->notifySuccess('messages.booking.cancelled');
-        } catch (\Exception $e) {
-            $this->notifyError('messages.booking.cancel_error');
-        }
-    }
+    // public function cancelBooking($bookingId)
+    // {
+    //     try {
+    //         $this->bookingRepository->cancel($bookingId);
+    //         $this->notifySuccess('messages.booking.cancelled');
+    //     } catch (\Exception $e) {
+    //         $this->notifyError('messages.booking.cancel_error');
+    //     }
+    // }
 
-    public function processRenewal()
-    {
-        $this->validate([
-            'renewalPlanId' => 'required|exists:plans,id',
-            'renewalStartedAt' => 'required|date',
-            'renewalEndedAt' => 'required|date|after:renewalStartedAt',
-        ]);
+    // public function processRenewal()
+    // {
+    //     $this->validate([
+    //         'renewalPlanId' => 'required|exists:plans,id',
+    //         'renewalStartedAt' => 'required|date',
+    //         'renewalEndedAt' => 'required|date|after:renewalStartedAt',
+    //     ]);
 
-        try {
-            $plan = Plan::find($this->renewalPlanId);
-            $newCost = $plan->price * $this->renewalDuration;
+    //     try {
+    //         $plan = Plan::find($this->renewalPlanId);
+    //         $newCost = $plan->price * $this->renewalDuration;
 
-            $this->bookingRepository->renew($this->renewalBooking->id, [
-                'plan_id' => $this->renewalPlanId,
-                'started_at' => $this->renewalStartedAt,
-                'ended_at' => $this->renewalEndedAt,
-                'additional_cost' => $newCost,
-            ]);
+    //         $this->bookingRepository->renew($this->selectedBooking->id, [
+    //             'plan_id' => $this->renewalPlanId,
+    //             'started_at' => $this->renewalStartedAt,
+    //             'ended_at' => $this->renewalEndedAt,
+    //             'additional_cost' => $newCost,
+    //         ]);
 
-            $this->showRenewalModal = false;
-            $this->notifySuccess('messages.booking.renewed');
-        } catch (\Exception $e) {
-            $this->notifyError('messages.booking.renew_error');
-        }
-    }
+    //         $this->showRenewalModal = false;
+    //         $this->notifySuccess('messages.booking.renewed');
+    //     } catch (\Exception $e) {
+    //         $this->notifyError('messages.booking.renew_error');
+    //     }
+    // }
 
     public function render()
     {
