@@ -1,7 +1,13 @@
 <div class="p-6">
     <!-- Header -->
-    <div class="mb-6">
+    <div class="mb-6 flex justify-between items-center">
         <flux:heading>{{ __('Finance Management') }}</flux:heading>
+        <flux:button wire:click="$set('showExportModal', true)" variant="primary">
+            <div class="flex items-center">
+                <flux:icon name="document-arrow-down" class="w-4 h-4 mr-2" />
+                {{ __('Export') }}
+            </div>
+        </flux:button>
     </div>
 
     <!-- Statistics Cards -->
@@ -37,7 +43,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+    <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-5">
         <flux:input
             wire:model.live="search"
             type="search"
@@ -56,6 +62,12 @@
             @foreach(\App\Enums\PaymentMethod::cases() as $method)
                 <option value="{{ $method->value }}">{{ $method->label() }}</option>
             @endforeach
+        </flux:select>
+
+        <flux:select wire:model.live="statusFilter">
+            <option value="">{{ __('All Statuses') }}</option>
+            <option value="active">{{ __('Active') }}</option>
+            <option value="voided">{{ __('Voided') }}</option>
         </flux:select>
 
         <flux:select wire:model.live="dateFilter">
@@ -188,6 +200,57 @@
                 </flux:button>
                 <flux:button wire:click="confirmVoid" variant="danger">
                     {{ __('Void Payment') }}
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
+    <!-- Export Modal -->
+    <flux:modal wire:model="showExportModal" variant="flyout">
+        <div class="space-y-6">
+            <flux:heading size="lg">{{ __('Export Finances') }}</flux:heading>
+
+            <div class="space-y-4">
+                <p>{{ __('Select columns to export:') }}</p>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="flex items-center space-x-2">
+                        <flux:checkbox wire:model="selectedColumns" value="type" />
+                        <span>{{ __('Type') }}</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <flux:checkbox wire:model="selectedColumns" value="reference" />
+                        <span>{{ __('Reference') }}</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <flux:checkbox wire:model="selectedColumns" value="amount" />
+                        <span>{{ __('Amount') }}</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <flux:checkbox wire:model="selectedColumns" value="note" />
+                        <span>{{ __('Note') }}</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <flux:checkbox wire:model="selectedColumns" value="date" />
+                        <span>{{ __('Date') }}</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <flux:checkbox wire:model="selectedColumns" value="payment_method" />
+                        <span>{{ __('Payment Method') }}</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <flux:checkbox wire:model="selectedColumns" value="status" />
+                        <span>{{ __('Status') }}</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <flux:button type="button" wire:click="$set('showExportModal', false)" variant="outline">
+                    {{ __('Cancel') }}
+                </flux:button>
+                <flux:button wire:click="exportSelected" variant="primary">
+                    {{ __('Export') }}
                 </flux:button>
             </div>
         </div>
