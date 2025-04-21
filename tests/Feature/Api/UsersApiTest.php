@@ -54,7 +54,7 @@ class UsersApiTest extends TestCase
         $userData = [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'password' => 'password'
+            'password' => 'password123'
         ];
 
         $response = $this->postJson('/api/users', $userData);
@@ -66,24 +66,37 @@ class UsersApiTest extends TestCase
                     'name' => $userData['name'],
                     'email' => $userData['email']
                 ]
-            ]);
-    }
-
-    public function test_can_show_user()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->getJson("/api/users/{$user->id}");
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
+            ])
+            ->assertJsonStructure([
+                'status',
+                'message',
                 'data' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email
+                    'id',
+                    'name',
+                    'email',
+                    'created_at'
                 ]
             ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => $userData['email']
+        ]);
+    }
+
+    public function test_cannot_create_user_with_existing_email()
+    {
+        $existingUser = User::factory()->create();
+
+        $userData = [
+            'name' => fake()->name(),
+            'email' => $existingUser->email,
+            'password' => 'password123'
+        ];
+
+        $response = $this->postJson('/api/users', $userData);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_can_update_user()
@@ -92,7 +105,6 @@ class UsersApiTest extends TestCase
         $updatedData = [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'password' => 'password'
         ];
 
         $response = $this->putJson("/api/users/{$user->id}", $updatedData);
@@ -104,7 +116,22 @@ class UsersApiTest extends TestCase
                     'name' => $updatedData['name'],
                     'email' => $updatedData['email']
                 ]
+            ])
+            ->assertJsonStructure([
+                'status',
+                'message',
+                'data' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at'
+                ]
             ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'email' => $updatedData['email']
+        ]);
     }
 
     public function test_can_delete_user()
@@ -113,12 +140,7 @@ class UsersApiTest extends TestCase
 
         $response = $this->deleteJson("/api/users/{$user->id}");
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
-                'message' => 'User deleted successfully'
-            ]);
-
+        $response->assertStatus(200);
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
     }
 }

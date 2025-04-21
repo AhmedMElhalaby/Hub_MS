@@ -26,8 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{booking}/renew', [BookingsController::class, 'renew']);
     });
     Route::apiResource('customers', CustomersController::class);
+    Route::get('workspaces/available', [WorkspacesController::class, 'available']);
     Route::apiResource('workspaces', WorkspacesController::class);
-    Route::get('workspaces/status/available', [WorkspacesController::class, 'available']);
     Route::apiResource('plans', PlansController::class);
     Route::apiResource('expenses', ExpensesController::class);
     Route::apiResource('users', UsersController::class);

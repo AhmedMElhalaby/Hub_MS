@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\WorkspaceStatus;
 use App\Models\Workspace;
 
 class WorkspaceRepository extends BaseRepository
@@ -37,6 +38,8 @@ class WorkspaceRepository extends BaseRepository
 
     public function getAvailable()
     {
-        return $this->model->available()->get();
+        return $this->model
+            ->where('status', WorkspaceStatus::Available)
+            ->get();
     }
 }
