@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Enums\PaymentMethod;
+use App\Enums\PlanType;
 use App\Models\Plan;
 use App\Repositories\BookingRepository;
 use Carbon\Carbon;
@@ -138,9 +139,26 @@ trait HasBookingActions
 
     protected function calculateRenewalEndDate()
     {
-        if ($this->renewalStartedAt && $this->renewalDuration) {
-            $startDate = Carbon::parse($this->renewalStartedAt);
-            $this->renewalEndedAt = $startDate->copy()->addDays((int) $this->renewalDuration)->format('Y-m-d\TH:i');
+        if ($this->renewalPlanId && $this->renewalStartedAt && $this->renewalDuration) {
+            $plan = Plan::find($this->renewalPlanId);
+            $start = \Carbon\Carbon::parse($this->renewalStartedAt);
+            $duration = (int) $this->renewalDuration;
+
+            // Calculate end date based on plan type and duration
+            switch ($plan->type) {
+                case PlanType::Hourly:
+                    $this->renewalEndedAt = $start->addHours($duration);
+                    break;
+                case PlanType::Daily:
+                    $this->renewalEndedAt = $start->addDays($duration);
+                    break;
+                case PlanType::Weekly:
+                    $this->renewalEndedAt = $start->addWeeks($duration);
+                    break;
+                case PlanType::Monthly:
+                    $this->renewalEndedAt = $start->addMonths($duration);
+                    break;
+            }
         }
     }
 }
