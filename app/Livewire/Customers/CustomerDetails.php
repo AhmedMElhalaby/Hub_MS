@@ -7,6 +7,7 @@ use App\Repositories\CustomerRepository;
 use App\Services\NotificationService;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 
 #[Layout('components.layouts.app')]
 class CustomerDetails extends Component
@@ -27,7 +28,7 @@ class CustomerDetails extends Component
             $this->customer = $this->customerRepository->findWithBookings($customer->id);
         } catch (\Exception $e) {
             $this->notifyError('messages.customer.not_found');
-            return $this->redirect(route('customers.index'));
+            return $this->redirect(tenant_route('customers.index'));
         }
     }
 
@@ -39,5 +40,11 @@ class CustomerDetails extends Component
     public function render()
     {
         return view('livewire.customers.customer-details');
+    }
+
+    #[On('refresh')]
+    public function refresh()
+    {
+        $this->render();
     }
 }

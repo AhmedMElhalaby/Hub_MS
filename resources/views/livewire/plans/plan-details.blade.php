@@ -2,9 +2,14 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <flux:heading>{{ __('Plan Details') }}</flux:heading>
-            <flux:button wire:navigate href="{{ route('plans.index') }}" variant="outline">
-                {{ __('Back to Plans') }}
-            </flux:button>
+            <div class="flex space-x-2">
+                <flux:button wire:click="$dispatch('open-edit-plan', { planId: {{ $plan->id }} })" variant="primary">
+                    {{ __('Edit Plan') }}
+                </flux:button>
+                <flux:button wire:navigate href="{{ tenant_route('plans.index') }}" variant="outline">
+                    {{ __('Back to Plans') }}
+                </flux:button>
+            </div>
         </div>
     </div>
 
@@ -61,4 +66,12 @@
             </flux:card>
         @endif
     </div>
+    <livewire:plans.edit-plan />
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('plan-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>

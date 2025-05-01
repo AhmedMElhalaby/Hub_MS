@@ -2,15 +2,13 @@
     use App\Models\Setting;
 @endphp
 <div class="p-6">
-    <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <flux:heading>{{ __('Plans Management') }}</flux:heading>
-        <flux:button wire:click="create" variant="primary">
+        <flux:button wire:click="$dispatch('open-create-plan')" variant="primary">
             {{ __('Add New Plan') }}
         </flux:button>
     </div>
 
-    <!-- Search and Filter -->
     <div class="flex gap-4 mb-4">
         <div class="flex-1">
             <flux:input wire:model.live="search" type="search" label="{{ __('Search') }}"
@@ -18,7 +16,6 @@
         </div>
     </div>
 
-    <!-- Plans Table -->
     <div class="overflow-x-auto">
         <flux:table>
             <x-slot:header>
@@ -64,13 +61,13 @@
                         @endif
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ route('plans.show', $plan) }}" size="sm">
+                                <flux:button wire:navigate href="{{ tenant_route('plans.show', $plan) }}" size="sm">
                                     {{ __('View') }}
                                 </flux:button>
-                                <flux:button wire:click="edit({{ $plan->id }})" size="sm">
+                                <flux:button wire:click="$dispatch('open-edit-plan', { planId: {{ $plan->id }} })" size="sm">
                                     {{ __('Edit') }}
                                 </flux:button>
-                                <flux:button wire:click="confirmDelete({{ $plan->id }})" variant="danger"
+                                <flux:button wire:click="$dispatch('open-delete-plan', { planId: {{ $plan->id }} })" variant="danger"
                                     size="sm">
                                     {{ __('Delete') }}
                                 </flux:button>
@@ -87,78 +84,26 @@
             </x-slot:body>
         </flux:table>
 
-        <!-- Pagination -->
         <div class="mt-6">
             @include('flux.pagination', ['paginator' => $plans])
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
-    <flux:modal wire:model="showModal" variant="flyout">
-        <form wire:submit.prevent="save" class="space-y-6">
-            <flux:heading size="lg">
-                {{ $planId ? __('Edit Plan') : __('Create Plan') }}
-            </flux:heading>
+    <livewire:plans.create-plan />
+    <livewire:plans.edit-plan />
+    <livewire:plans.delete-plan />
 
-            <flux:select
-                wire:model="type"
-                label="{{ __('Type') }}"
-                required
-                :error="$errors->first('type')"
-            >
-                <option value="">{{ __('Select Type') }}</option>
-                @foreach($types as $type)
-                    <option value="{{ $type->value }}">{{ $type->label() }}</option>
-                @endforeach
-            </flux:select>
-
-            <flux:input
-                wire:model="price"
-                label="{{ __('Price') }}"
-                type="number"
-                step="0.01"
-                required
-                :error="$errors->first('price')"
-            />
-            @if(Setting::get('mikrotik_enabled'))
-            <flux:select
-                wire:model="mikrotik_profile"
-                label="{{ __('Mikrotik Profile') }}"
-                required
-                :error="$errors->first('mikrotik_profile')">
-                <option value="">{{ __('Select Profile') }}</option>
-                @foreach($availableProfiles as $profile)
-                    <option value="{{ $profile }}">{{ $profile }}</option>
-                @endforeach
-            </flux:select>
-            @endif
-            <div class="flex justify-end space-x-2 mt-10">
-                <flux:button type="button" wire:click="resetForm" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button wire:loading.attr="disabled" wire:target="save" type="submit"
-                    variant="primary">
-                    <span wire:loading.remove wire:target="save">{{ __('Save') }}</span>
-                    <span wire:loading wire:target="save">{{ __('Saving...') }}</span>
-                </flux:button>
-            </div>
-        </form>
-    </flux:modal>
-
-    <!-- Delete Confirmation Modal -->
-    <flux:modal wire:model="showDeleteModal">
-        <div class="space-y-6">
-            <flux:heading size="lg">{{ __('Delete Plan') }}</flux:heading>
-            <p>{{ __('Are you sure you want to delete this plan?') }}</p>
-            <div class="flex justify-end space-x-2">
-                <flux:button wire:click="resetForm" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button wire:click="delete" variant="danger">
-                    {{ __('Delete') }}
-                </flux:button>
-            </div>
-        </div>
-    </flux:modal>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('plan-created', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('plan-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('plan-deleted', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>
-```

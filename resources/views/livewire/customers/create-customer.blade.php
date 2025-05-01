@@ -1,8 +1,8 @@
 <div>
     <flux:modal wire:model="showModal" variant="flyout">
-        <form wire:submit.prevent="save" class="space-y-6">
+        <form wire:submit.prevent="store" class="space-y-6">
             <flux:heading size="lg">
-                {{ $customerId ? __('Edit Customer') : __('Create Customer') }}
+                {{ __('Create Customer') }}
             </flux:heading>
 
             <flux:input
@@ -44,8 +44,8 @@
                     {{ __('Cancel') }}
                 </flux:button>
                 <flux:button wire:loading.attr="disabled" wire:target="save" type="submit" variant="primary">
-                    <span wire:loading.remove wire:target="save">{{ __('Save') }}</span>
-                    <span wire:loading wire:target="save">{{ __('Saving...') }}</span>
+                    <span wire:loading.remove wire:target="store">{{ __('Save') }}</span>
+                    <span wire:loading wire:target="store">{{ __('Saving...') }}</span>
                 </flux:button>
             </div>
         </form>

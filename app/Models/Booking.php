@@ -4,16 +4,19 @@ namespace App\Models;
 
 use App\Enums\BookingStatus;
 use App\Enums\PlanType;
+use App\Traits\BelongsToTenant;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Booking extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
+        'tenant_id',
         'customer_id',
         'workspace_id',
         'plan_id',
@@ -23,7 +26,9 @@ class Booking extends Model
         'balance',
         'status',
         'hotspot_username',
-        'hotspot_password'
+        'hotspot_password',
+        'hotspot_is_created',
+        'credentials_is_sent'
     ];
     protected $casts = [
         'status' => BookingStatus::class,
@@ -33,6 +38,8 @@ class Booking extends Model
         'balance' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'hotspot_is_created' => 'boolean',
+        'credentials_is_sent' => 'boolean',
     ];
     public function customer(): BelongsTo
     {
@@ -46,6 +53,10 @@ class Booking extends Model
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
+    }
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
     public function finances(): HasMany
     {
@@ -73,21 +84,21 @@ class Booking extends Model
     }
 
     public function getDurationFromDates()
-        {
-            $start = Carbon::parse($this->started_at);
-            $end = Carbon::parse($this->ended_at);
+    {
+        $start = Carbon::parse($this->started_at);
+        $end = Carbon::parse($this->ended_at);
 
-            switch ($this->plan->type) {
-                case PlanType::Hourly:
-                    return $end->diffInHours($start);
-                case PlanType::Daily:
-                    return $end->diffInDays($start);
-                case PlanType::Weekly:
-                    return $end->diffInWeeks($start);
-                case PlanType::Monthly:
-                    return $end->diffInMonths($start);
-                default:
-                    return 1;
-            }
+        switch ($this->plan->type) {
+            case PlanType::Hourly:
+                return $start->diffInHours($end);
+            case PlanType::Daily:
+                return $start->diffInDays($end);
+            case PlanType::Weekly:
+                return $start->diffInWeeks($end);
+            case PlanType::Monthly:
+                return $start->diffInMonths($end);
+            default:
+                return 1;
         }
+    }
 }

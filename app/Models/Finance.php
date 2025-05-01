@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Enums\FinanceType;
 use App\Enums\PaymentMethod;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Finance extends Model
 {
-    use HasFactory;
+    use HasFactory,BelongsToTenant;
 
     protected $fillable = [
         'type',

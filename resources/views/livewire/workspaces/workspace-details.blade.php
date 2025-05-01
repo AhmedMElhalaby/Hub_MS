@@ -2,9 +2,14 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <flux:heading>{{ __('Workspace Details') }}</flux:heading>
-            <flux:button wire:navigate href="{{ route('workspaces.index') }}" variant="outline">
-                {{ __('Back to Workspaces') }}
-            </flux:button>
+            <div class="flex space-x-2">
+                <flux:button wire:click="$dispatch('open-edit-workspace', { workspaceId: {{ $workspace->id }} })" variant="primary">
+                    {{ __('Edit Workspace') }}
+                </flux:button>
+                <flux:button wire:navigate href="{{ tenant_route('workspaces.index') }}" variant="outline">
+                    {{ __('Back to Workspaces') }}
+                </flux:button>
+            </div>
         </div>
     </div>
 
@@ -61,4 +66,12 @@
             </flux:card>
         @endif
     </div>
+    <livewire:workspaces.edit-workspace />
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('workspace-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>

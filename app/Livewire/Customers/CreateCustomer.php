@@ -19,7 +19,6 @@ class CreateCustomer extends Component
     public $mobile = '';
     public $address = '';
     public $specialization = '';
-    public $showModal = false;
 
     protected CustomerRepository $customerRepository;
 
@@ -28,20 +27,7 @@ class CreateCustomer extends Component
         $this->customerRepository = $customerRepository;
     }
 
-    #[On('edit-customer')]
-    public function edit($customerId)
-    {
-        $customer = $this->customerRepository->findById($customerId);
-        $this->customerId = $customer->id;
-        $this->name = $customer->name;
-        $this->email = $customer->email;
-        $this->mobile = $customer->mobile;
-        $this->address = $customer->address;
-        $this->specialization = $customer->specialization->value;
-        $this->showModal = true;
-    }
-
-    public function save()
+    public function store()
     {
         $validated = $this->validate([
             'name' => 'required|string|max:255',
@@ -52,17 +38,11 @@ class CreateCustomer extends Component
         ]);
 
         try {
-            if ($this->customerId) {
-                $customer = $this->customerRepository->update($this->customerId, $validated);
-            } else {
-                $customer = $this->customerRepository->create($validated);
-            }
-
-            $this->dispatch('customer-created', customerId: $customer->id);
+            $this->customerRepository->create($validated);
             $this->reset();
-            $this->showModal = false;
-
-            $this->notifySuccess('messages.customer.' . ($this->customerId ? 'updated' : 'created'));
+            $this->closeModal();
+            $this->dispatch('customer-created');
+            $this->notifySuccess('messages.customer.created');
         } catch (\Exception $e) {
             $this->notifyError('messages.customer.save_error');
         }
@@ -78,6 +58,6 @@ class CreateCustomer extends Component
     #[On('open-create-customer')]
     public function open()
     {
-        $this->showModal = true;
+        $this->openModal();
     }
 }

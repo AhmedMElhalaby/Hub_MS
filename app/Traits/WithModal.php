@@ -5,7 +5,7 @@ namespace App\Traits;
 trait WithModal
 {
     public $showModal = false;
-    public $showDeleteModal = false;
+    public $showFilter = false;
 
     public function openModal()
     {
@@ -17,13 +17,8 @@ trait WithModal
         $this->showModal = false;
     }
 
-    public function openDeleteModal()
+    public function triggerFilter()
     {
-        $this->showDeleteModal = true;
-    }
-
-    public function closeDeleteModal()
-    {
-        $this->showDeleteModal = false;
+        $this->showFilter = !$this->showFilter;
     }
 }

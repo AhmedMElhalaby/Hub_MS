@@ -7,6 +7,7 @@ use App\Repositories\UserRepository;
 use App\Services\NotificationService;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 
 #[Layout('components.layouts.app')]
 class UserDetails extends Component
@@ -27,12 +28,18 @@ class UserDetails extends Component
             $this->user = $this->userRepository->findById($user->id);
         } catch (\Exception $e) {
             $this->notifyError('messages.user.not_found');
-            return $this->redirect(route('users.index'));
+            return $this->redirect(tenant_route('users.index'));
         }
     }
 
     public function render()
     {
         return view('livewire.users.user-details');
+    }
+
+    #[On('refresh')]
+    public function refresh()
+    {
+        $this->render();
     }
 }

@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('event_type'); // Created, Confirmed, Cancelled, Payment, Renewed
-            $table->json('metadata')->nullable(); // Store additional event details
+            $table->string('event_type');
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }

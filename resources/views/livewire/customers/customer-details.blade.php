@@ -2,13 +2,16 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <flux:heading>{{ __('Customer Details') }}</flux:heading>
-            <flux:button wire:navigate href="{{ route('customers.index') }}" variant="outline">
-                {{ __('Back to Customers') }}
-            </flux:button>
+            <div class="flex space-x-2">
+                <flux:button wire:click="$dispatch('open-edit-customer', { customerId: {{ $customer->id }} })" variant="primary">
+                    {{ __('Edit Customer') }}
+                </flux:button>
+                <flux:button wire:navigate href="{{ tenant_route('customers.index') }}" variant="outline">
+                    {{ __('Back to Customers') }}
+                </flux:button>
+            </div>
         </div>
     </div>
-
-    <!-- Customer Information Card -->
     <div class="mb-8 grid gap-6 lg:grid-cols-2">
         <flux:card>
             <flux:card.header>
@@ -58,8 +61,6 @@
             </flux:card.content>
         </flux:card>
     </div>
-
-    <!-- Bookings History -->
     <flux:card class="mb-6 mt-3">
         <flux:card.header>
             <flux:heading size="sm">{{ __('Booking History') }}</flux:heading>
@@ -102,4 +103,14 @@
             </flux:table>
         </flux:card.content>
     </flux:card>
+
+
+    <livewire:customers.edit-customer />
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('customer-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>

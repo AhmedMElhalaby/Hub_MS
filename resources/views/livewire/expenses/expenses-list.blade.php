@@ -2,7 +2,7 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <flux:heading>{{ __('Expenses Management') }}</flux:heading>
-        <flux:button wire:click="create" variant="primary">
+        <flux:button wire:click="$dispatch('open-create-expense')" variant="primary">
             {{ __('Add New Expense') }}
         </flux:button>
     </div>
@@ -12,6 +12,14 @@
         <div class="flex-1">
             <flux:input wire:model.live="search" type="search" label="{{ __('Search') }}"
                 placeholder="Search expenses..." />
+        </div>
+        <div class="w-64">
+            <flux:select wire:model.live="categoryFilter" label="{{ __('Filter by Category') }}">
+                <option value="">{{ __('All Categories') }}</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->value }}">{{ $category->label() }}</option>
+                @endforeach
+            </flux:select>
         </div>
     </div>
 
@@ -47,14 +55,13 @@
                         <flux:table.cell>{{ number_format($expense->amount, 2) }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ route('expenses.show', $expense) }}" size="sm">
+                                <flux:button wire:navigate href="{{ tenant_route('expenses.show', $expense) }}" size="sm">
                                     {{ __('View') }}
                                 </flux:button>
-                                <flux:button wire:click="edit({{ $expense->id }})" size="sm">
+                                <flux:button wire:click="$dispatch('open-edit-expense', { expenseId: {{ $expense->id }} })" size="sm">
                                     {{ __('Edit') }}
                                 </flux:button>
-                                <flux:button wire:click="confirmDelete({{ $expense->id }})" variant="danger"
-                                    size="sm">
+                                <flux:button wire:click="$dispatch('open-delete-expense', { expenseId: {{ $expense->id }} })" variant="danger" size="sm">
                                     {{ __('Delete') }}
                                 </flux:button>
                             </div>
@@ -76,60 +83,20 @@
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
-    <flux:modal wire:model="showModal" variant="flyout">
-        <form wire:submit.prevent="save" class="space-y-6">
-            <flux:heading size="lg">
-                {{ $expenseId ? __('Edit Expense') : __('Create Expense') }}
-            </flux:heading>
-
-            <flux:select
-                wire:model="category"
-                label="{{ __('Category') }}"
-                required
-                :error="$errors->first('category')"
-            >
-                <option value="">{{ __('Select Category') }}</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->value }}">{{ $category->label() }}</option>
-                @endforeach
-            </flux:select>
-
-            <flux:input
-                wire:model="amount"
-                label="{{ __('Amount') }}"
-                type="number"
-                step="0.01"
-                required
-                :error="$errors->first('amount')"
-            />
-
-            <div class="flex justify-end space-x-2 mt-10">
-                <flux:button type="button" wire:click="resetForm" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button wire:loading.attr="disabled" wire:target="save" type="submit"
-                    variant="primary">
-                    <span wire:loading.remove wire:target="save">{{ __('Save') }}</span>
-                    <span wire:loading wire:target="save">{{ __('Saving...') }}</span>
-                </flux:button>
-            </div>
-        </form>
-    </flux:modal>
-
-    <!-- Delete Confirmation Modal -->
-    <flux:modal wire:model="showDeleteModal">
-        <div class="space-y-6">
-            <flux:heading size="lg">{{ __('Delete Expense') }}</flux:heading>
-            <p>{{ __('Are you sure you want to delete this expense?') }}</p>
-            <div class="flex justify-end space-x-2">
-                <flux:button wire:click="resetForm" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button wire:click="delete" variant="danger">
-                    {{ __('Delete') }}
-                </flux:button>
-            </div>
-        </div>
-    </flux:modal>
+    <livewire:expenses.create-expense />
+    <livewire:expenses.edit-expense />
+    <livewire:expenses.delete-expense />
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('expense-created', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('expense-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('expense-deleted', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>

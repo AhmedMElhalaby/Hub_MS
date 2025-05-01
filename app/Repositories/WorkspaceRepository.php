@@ -14,7 +14,11 @@ class WorkspaceRepository extends BaseRepository
 
     protected function applySearch($query, $search)
     {
-        return $query->where('desk', 'like', '%' . $search . '%');
+        $query->where('desk', 'like', '%' . $search['q'] . '%');
+        if (!empty($search['status'])) {
+            $query->where('status', $search['status']);
+        }
+        return $query;
     }
 
     public function findWithBookings($id)

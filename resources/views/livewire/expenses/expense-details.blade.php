@@ -1,6 +1,16 @@
 <div class="p-6">
     <div class="mb-6">
-        <flux:heading>{{ __('Expense Details') }}</flux:heading>
+        <div class="flex items-center justify-between">
+            <flux:heading>{{ __('Expense Details') }}</flux:heading>
+            <div class="flex space-x-2">
+                <flux:button wire:click="$dispatch('open-edit-expense', { expenseId: {{ $expense->id }} })" variant="primary">
+                    {{ __('Edit Expense') }}
+                </flux:button>
+                <flux:button wire:navigate href="{{ tenant_route('expenses.index') }}" variant="outline">
+                    {{ __('Back to Expenses') }}
+                </flux:button>
+            </div>
+        </div>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
@@ -60,4 +70,12 @@
             </flux:card.content>
         </flux:card>
     </div>
+    <livewire:expenses.edit-expense />
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('expense-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>

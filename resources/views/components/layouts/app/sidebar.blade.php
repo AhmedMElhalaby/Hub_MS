@@ -26,27 +26,27 @@
         <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="mr-5 flex items-center space-x-2" wire:navigate>
+            <a href="{{ tenant_route('dashboard') }}" class="mr-5 flex items-center space-x-2" wire:navigate>
                 <x-app-logo class="size-8" href="#"></x-app-logo>
             </a>
 
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="Platform" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                    <flux:navlist.item icon="users" :href="route('customers.index')" :current="request()->routeIs('customers.*')" wire:navigate>{{ __('Customers') }}</flux:navlist.item>
-                    <flux:navlist.item icon="briefcase" :href="route('workspaces.index')" :current="request()->routeIs('workspaces.*')" wire:navigate>{{ __('Workspaces') }}</flux:navlist.item>
-                    <flux:navlist.item icon="currency-dollar" :href="route('plans.index')" :current="request()->routeIs('plans.*')" wire:navigate>{{ __('Plans') }}</flux:navlist.item>
-                    <flux:navlist.item icon="receipt-percent" :href="route('expenses.index')" :current="request()->routeIs('expenses.*')" wire:navigate>{{ __('Expenses') }}</flux:navlist.item>
-                    <flux:navlist.item icon="calendar" :href="route('bookings.index')" :current="request()->routeIs('bookings.*')" wire:navigate>{{ __('Bookings') }}</flux:navlist.item>
+                    <flux:navlist.item icon="home" :href="tenant_route('dashboard')" :current="request()->routeIs('dashboard')">{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="users" :href="tenant_route('customers.index')" :current="request()->routeIs('customers.*')">{{ __('Customers') }}</flux:navlist.item>
+                    <flux:navlist.item icon="briefcase" :href="tenant_route('workspaces.index')" :current="request()->routeIs('workspaces.*')">{{ __('Workspaces') }}</flux:navlist.item>
+                    <flux:navlist.item icon="currency-dollar" :href="tenant_route('plans.index')" :current="request()->routeIs('plans.*')">{{ __('Plans') }}</flux:navlist.item>
+                    <flux:navlist.item icon="receipt-percent" :href="tenant_route('expenses.index')" :current="request()->routeIs('expenses.*')">{{ __('Expenses') }}</flux:navlist.item>
+                    <flux:navlist.item icon="calendar" :href="tenant_route('bookings.index')" :current="request()->routeIs('bookings.*')">{{ __('Bookings') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
 
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="banknotes" :href="route('finances.index')" :current="request()->routeIs('finances.*')" wire:navigate>{{ __('Finances') }}</flux:navlist.item>
-                <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.index')" wire:navigate>{{ __('Manage Users') }}</flux:navlist.item>
-                <flux:navlist.item icon="bell" :href="route('notifications.index')" :current="request()->routeIs('notifications.*')" wire:navigate class="relative">
+                <flux:navlist.item icon="banknotes" :href="tenant_route('finances.index')" :current="request()->routeIs('finances.*')">{{ __('Finances') }}</flux:navlist.item>
+                <flux:navlist.item icon="users" :href="tenant_route('users.index')" :current="request()->routeIs('users.index')">{{ __('Manage Users') }}</flux:navlist.item>
+                <flux:navlist.item icon="bell" :href="tenant_route('notifications.index')" :current="request()->routeIs('notifications.*')" class="relative">
                     {{ __('Notifications') }}
                     @php
                         $unreadCount = auth()->user()->unreadNotifications()->count();
@@ -90,12 +90,12 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item href="{{ tenant_route('settings.general') }}" icon="cog">{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
 
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    <form method="POST" action="{{ tenant_route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
                             {{ __('Log Out') }}
@@ -145,7 +145,7 @@
 
                     <flux:menu.separator />
 
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    <form method="POST" action="{{ tenant_route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
                             {{ __('Log Out') }}

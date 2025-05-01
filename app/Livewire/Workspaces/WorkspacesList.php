@@ -4,23 +4,20 @@ namespace App\Livewire\Workspaces;
 
 use App\Repositories\WorkspaceRepository;
 use App\Services\NotificationService;
-use App\Traits\WithModal;
 use App\Traits\WithSorting;
 use App\Enums\WorkspaceStatus;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
-use Illuminate\Validation\Rules\Enum;
+use Livewire\Attributes\On;
 
 #[Layout('components.layouts.app')]
 class WorkspacesList extends Component
 {
-    use WithPagination, WithSorting, WithModal, NotificationService;
+    use WithPagination, WithSorting, NotificationService;
 
-    public $desk = '';
-    public $status = '';
-    public $workspaceId;
     public $statusFilter = '';
+    public $search = '';
 
     protected WorkspaceRepository $workspaceRepository;
 
@@ -36,74 +33,25 @@ class WorkspacesList extends Component
         ]);
     }
 
-    public function resetForm()
-    {
-        $this->reset(['workspaceId', 'desk', 'status']);
-    }
-
-    public function create()
-    {
-        $this->resetForm();
-        $this->openModal();
-    }
-
-    public function edit($workspaceId)
-    {
-        $workspace = $this->workspaceRepository->findById($workspaceId);
-        $this->workspaceId = $workspace->id;
-        $this->desk = $workspace->desk;
-        $this->status = $workspace->status;
-        $this->openModal();
-    }
-
-    public function confirmDelete($workspaceId)
-    {
-        $this->workspaceId = $workspaceId;
-        $this->openDeleteModal();
-    }
-
-    public function save()
-    {
-        $validated = $this->validate([
-            'desk' => 'required|numeric',
-            'status' => ['required', new Enum(WorkspaceStatus::class)],
-        ]);
-
-        try {
-            if ($this->workspaceId) {
-                $this->workspaceRepository->update($this->workspaceId, $validated);
-            } else {
-                $this->workspaceRepository->create($validated);
-            }
-
-            $this->notifySuccess('messages.workspace.saved');
-            $this->closeModal();
-        } catch (\Exception $e) {
-            $this->notifyError('messages.workspace.save_error');
-        }
-    }
-
-    public function delete()
-    {
-        try {
-            $this->workspaceRepository->delete($this->workspaceId);
-            $this->notifySuccess('messages.workspace.deleted');
-            $this->closeDeleteModal();
-        } catch (\Exception $e) {
-            $this->notifyError('messages.workspace.delete_error');
-        }
-    }
-
     public function render()
     {
         return view('livewire.workspaces.workspaces-list', [
             'workspaces' => $this->workspaceRepository->getAllPaginated(
-                $this->search,
+                [
+                    'q'=>$this->search,
+                    'status'=>$this->statusFilter
+                ],
                 $this->sortField,
                 $this->sortDirection,
                 $this->perPage
             ),
             'statuses' => WorkspaceStatus::cases()
         ]);
+    }
+
+    #[On('refresh')]
+    public function refresh()
+    {
+        $this->render();
     }
 }

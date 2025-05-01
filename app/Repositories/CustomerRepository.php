@@ -13,13 +13,21 @@ class CustomerRepository extends BaseRepository
 
     protected function applySearch($query, $search)
     {
-        return $query->where('name', 'like', '%' . $search . '%')
-            ->orWhere('email', 'like', '%' . $search . '%')
-            ->orWhere('mobile', 'like', '%' . $search . '%');
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search['q'] . '%')
+            ->orWhere('email', 'like', '%' . $search['q'] . '%')
+            ->orWhere('mobile', 'like', '%' . $search['q'] . '%');
+        });
+        if (!empty($search['specialization'])) {
+            $query->where('specialization', $search['specialization']);
+        }
+        return $query;
     }
 
     public function findWithBookings($id)
     {
         return $this->findById($id)->load('bookings');
     }
+
+
 }

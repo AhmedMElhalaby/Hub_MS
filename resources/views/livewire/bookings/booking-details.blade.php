@@ -1,7 +1,37 @@
+@use('App\Enums\BookingStatus')
 <div class="p-6">
     <div class="mb-6 flex items-center justify-between">
         <flux:heading>{{ __('Booking Details') }}</flux:heading>
-        <x-booking.actions :booking="$booking" />
+        <div class="flex space-x-2">
+            @if($booking->status->canEdit())
+                <flux:button wire:click="$dispatch('open-edit-booking', { bookingId: {{ $booking->id }} })" size="sm" variant="outline">
+                    {{ __('Edit') }}
+                </flux:button>
+            @endif
+            @if($booking->status->canConfirm())
+                <flux:button wire:click="$dispatch('open-confirm-booking', { bookingId: {{ $booking->id }} })" size="sm">
+                    {{ __('Confirm') }}
+                </flux:button>
+            @endif
+            @if($booking->status->canPay() && $booking->balance > 0)
+                <flux:button wire:click="$dispatch('open-pay-booking', { bookingId: {{ $booking->id }} })" variant="primary" size="sm">
+                    {{ __('Pay') }}
+                </flux:button>
+            @endif
+            @if($booking->status->canCancel())
+                <flux:button wire:click="$dispatch('open-cancel-booking', { bookingId: {{ $booking->id }} })" variant="danger" size="sm">
+                    {{ __('Cancel') }}
+                </flux:button>
+            @endif
+            @if($booking->status->canRenew())
+                <flux:button wire:click="$dispatch('open-renew-booking', { bookingId: {{ $booking->id }} })" variant="primary" size="sm">
+                    {{ __('Renew') }}
+                </flux:button>
+            @endif
+            <flux:button wire:navigate href="{{ tenant_route('bookings.index') }}" variant="outline" size="sm">
+                {{ __('Back to Bookings') }}
+            </flux:button>
+        </div>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
@@ -111,7 +141,6 @@
         </div>
     </div>
 
-    <!-- Payment History -->
     <div class="mt-6">
         <flux:card>
             <flux:card.header>
@@ -142,7 +171,6 @@
         </flux:card>
     </div>
 
-    <!-- Event History -->
     <div class="mt-6">
         <flux:card>
             <flux:card.header>
@@ -191,9 +219,25 @@
     @if($booking->hotspot_username)
         <flux:card class="mt-6">
             <flux:card.header class="flex items-center justify-between">
-                <flux:heading size="sm">{{ __('Hotspot Access Details') }}</flux:heading>
+                <div class="flex items-center space-x-4">
+                    <flux:heading size="sm">{{ __('Hotspot Access Details') }}</flux:heading>
+                    <div class="flex items-center space-x-2">
+                        @if($booking->hotspot_is_created)
+                            <flux:badge color="green">
+                                <flux:icon name="check-circle" class="size-4 mr-1" />
+                                {{ __('Created') }}
+                            </flux:badge>
+                        @endif
+                        @if($booking->credentials_is_sent)
+                            <flux:badge color="green">
+                                <flux:icon name="envelope" class="size-4 mr-1" />
+                                {{ __('Sent') }}
+                            </flux:badge>
+                        @endif
+                    </div>
+                </div>
                 <flux:button
-                    wire:click="$set('showCredentialsModal', true)"
+                    wire:click="$dispatch('open-send-credentials', { bookingId: {{ $booking->id }} })"
                     variant="outline"
                     size="sm"
                     class="flex space-x-2"
@@ -246,42 +290,33 @@
         </flux:card>
     @endif
 
-    <!-- Add this at the bottom of the file -->
-    <flux:modal wire:model="showCredentialsModal" variant="flyout">
-        <form wire:submit.prevent="sendCredentials" class="space-y-6">
-            <flux:heading size="lg">{{ __('Send Access Credentials') }}</flux:heading>
+    <livewire:bookings.send-credentials :booking="$booking" />
+    <livewire:bookings.pay-booking />
+    <livewire:bookings.edit-booking bookingId='{{ $booking->id }}'/>
+    <livewire:bookings.confirm-booking />
+    <livewire:bookings.renew-booking />
+    <livewire:bookings.cancel-booking />
 
-            <div class="space-y-4">
-                <div class="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900">
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span>{{ __('Username') }}</span>
-                            <span class="font-mono">{{ $booking->hotspot_username }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>{{ __('Password') }}</span>
-                            <span class="font-mono">{{ $booking->hotspot_password }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <flux:textarea
-                    wire:model="messageText"
-                    label="{{ __('Message') }}"
-                    rows="3"
-                    :error="$errors->first('messageText')"
-                />
-            </div>
-
-            <div class="flex justify-end space-x-2">
-                <flux:button type="button" wire:click="$set('showCredentialsModal', false)" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button type="submit" variant="primary">
-                    {{ __('Send') }}
-                </flux:button>
-            </div>
-        </form>
-    </flux:modal>
-    <x-booking.modals :selected-booking="$selectedBooking" :plans="$plans" :renewalEndedAt="$renewalEndedAt" />
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('booking-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('booking-canceled', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('booking-confirm', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('booking-payed', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('booking-renewed', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('credentials-sent', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>

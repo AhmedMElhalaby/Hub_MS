@@ -7,6 +7,7 @@ use App\Repositories\ExpenseRepository;
 use App\Services\NotificationService;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 
 #[Layout('components.layouts.app')]
 class ExpenseDetails extends Component
@@ -27,12 +28,18 @@ class ExpenseDetails extends Component
             $this->expense = $this->expenseRepository->findWithFinances($expense->id);
         } catch (\Exception $e) {
             $this->notifyError('messages.expense.not_found');
-            return $this->redirect(route('expenses.index'));
+            return $this->redirect(tenant_route('expenses.index'));
         }
     }
 
     public function render()
     {
         return view('livewire.expenses.expense-details');
+    }
+
+    #[On('refresh')]
+    public function refresh()
+    {
+        $this->render();
     }
 }

@@ -2,9 +2,15 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <flux:heading>{{ __('User Details') }}</flux:heading>
-            <flux:button wire:navigate href="{{ route('users.index') }}" variant="outline">
-                {{ __('Back to Users') }}
-            </flux:button>
+            <div class="flex space-x-2">
+
+                <flux:button wire:click="$dispatch('open-edit-user', { userId: {{ $user->id }} })" variant="primary">
+                    {{ __('Edit User') }}
+                </flux:button>
+                <flux:button wire:navigate href="{{ tenant_route('users.index') }}" variant="outline">
+                    {{ __('Back to Users') }}
+                </flux:button>
+            </div>
         </div>
     </div>
 
@@ -78,4 +84,13 @@
             </flux:table>
         </flux:card.content>
     </flux:card>
+
+    <livewire:users.edit-user />
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('user-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>

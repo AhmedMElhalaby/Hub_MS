@@ -25,7 +25,7 @@ class BookingCompleted extends Notification
             'title' => 'Booking Completed',
             'message' => "Booking for {$this->booking->customer->name} has been completed.",
             'type' => 'info',
-            'link' => route('bookings.show', $this->booking)
+            'link' => route('bookings.show', ['tenant'=>$this->booking->tenant->domain,'booking' => $this->booking->id])
         ];
     }
 }

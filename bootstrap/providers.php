@@ -6,4 +6,5 @@ return [
     App\Providers\VoltServiceProvider::class,
     App\Providers\SettingsServiceProvider::class,
     App\Providers\FluxServiceProvider::class,
+    App\Providers\TabsServiceProvider::class,
 ];

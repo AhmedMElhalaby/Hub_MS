@@ -1,5 +1,4 @@
 <div class="p-6">
-    <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <flux:heading>{{ __('Customers Management') }}</flux:heading>
         <flux:button wire:click="$dispatch('open-create-customer')" variant="primary">
@@ -7,7 +6,6 @@
         </flux:button>
     </div>
 
-    <!-- Search and Filter -->
     <div class="flex gap-4 mb-4">
         <div class="flex-1">
             <flux:input wire:model.live="search" type="search" label="{{ __('Search') }}"
@@ -23,7 +21,6 @@
         </div>
     </div>
 
-    <!-- Customers Table -->
     <div class="overflow-x-auto">
         <flux:table>
             <x-slot:header>
@@ -75,14 +72,14 @@
                         <flux:table.cell>{{ $customer->specialization->name }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ route('customers.show', $customer) }}"
+                                <flux:button wire:navigate href="{{ tenant_route('customers.show', $customer) }}"
                                     size="sm">
                                     {{ __('View') }}
                                 </flux:button>
-                                <flux:button wire:click="edit({{ $customer->id }})" size="sm">
+                                <flux:button wire:click="$dispatch('open-edit-customer', { customerId: {{ $customer->id }} })" size="sm">
                                     {{ __('Edit') }}
                                 </flux:button>
-                                <flux:button wire:click="confirmDelete({{ $customer->id }})" variant="danger"
+                                <flux:button wire:click="$dispatch('open-delete-customer', { customerId: {{ $customer->id }} })" variant="danger"
                                     size="sm">
                                     {{ __('Delete') }}
                                 </flux:button>
@@ -99,7 +96,6 @@
             </x-slot:body>
         </flux:table>
 
-        <!-- Pagination -->
         <div class="mt-6">
             @include('flux.pagination', ['paginator' => $customers])
         </div>
@@ -107,23 +103,21 @@
 
 
 
-    <!-- Delete Confirmation Modal -->
-    <flux:modal wire:model="showDeleteModal">
-        <div class="space-y-6">
-            <flux:heading size="lg">{{ __('Delete Customer') }}</flux:heading>
-            <p>{{ __('Are you sure you want to delete this customer?') }}</p>
-            <div class="flex justify-end space-x-2 mt-3">
-                <flux:button wire:click="resetForm" variant="outline">
-                    {{ __('Cancel') }}
-                </flux:button>
-                <flux:button wire:click="delete" variant="danger">
-                    {{ __('Delete') }}
-                </flux:button>
-            </div>
-        </div>
-    </flux:modal>
+    <livewire:customers.delete-customer />
     <livewire:customers.create-customer />
+    <livewire:customers.edit-customer />
 
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('customer-created', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('customer-updated', () => {
+                Livewire.dispatch('refresh');
+            });
+            Livewire.on('customer-deleted', () => {
+                Livewire.dispatch('refresh');
+            });
+        });
+    </script>
 </div>
-
-<!-- Add the component at the bottom -->

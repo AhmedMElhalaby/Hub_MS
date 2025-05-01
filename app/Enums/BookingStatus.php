@@ -29,6 +29,11 @@ enum BookingStatus: int
         };
     }
 
+    public function canEdit(): bool
+    {
+        return !in_array($this, [self::Completed, self::Cancelled]);
+    }
+
     public function canCancel(): bool
     {
         return !in_array($this, [self::Completed, self::Cancelled]) && in_array($this, [self::Draft, self::Confirmed]);
@@ -42,5 +47,9 @@ enum BookingStatus: int
     public function canRenew(): bool
     {
         return $this === self::Completed;
+    }
+    public function canPay(): bool
+    {
+        return !in_array($this, [self::Draft, self::Cancelled]);
     }
 }

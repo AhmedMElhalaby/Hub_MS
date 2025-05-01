@@ -14,7 +14,11 @@ class ExpenseRepository extends BaseRepository
 
     protected function applySearch($query, $search)
     {
-        return $query->where('category', 'like', '%' . $search . '%');
+        $query->Where('amount', 'like', '%' . $search['q'] . '%');
+        if (!empty($search['category'])) {
+            $query->where('category', $search['category']);
+        }
+        return $query;
     }
 
     public function create(array $data)
