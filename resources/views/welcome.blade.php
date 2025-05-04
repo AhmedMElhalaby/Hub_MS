@@ -18,7 +18,7 @@
                             <h1 class="text-2xl font-bold text-[#F8FAFC]">WTR Hub</h1>
                         </div>
                         <div class="flex items-center space-x-6">
-                            <a href="{{ route('login') }}" class="text-[#F8FAFC] hover:text-[#38BDF8] text-sm">Login</a>
+                            <a href="{{ route('register') }}" class="text-[#F8FAFC] hover:text-[#38BDF8] text-sm">Register</a>
                             <a href="#about" class="text-[#F8FAFC] hover:text-[#38BDF8] text-sm">About Us</a>
                             <a href="#contact" class="text-[#F8FAFC] hover:text-[#38BDF8] text-sm">Contact</a>
                         </div>
@@ -40,7 +40,7 @@
                                     Streamline your workspace management with our comprehensive solution. Perfect for companies looking to optimize their office space utilization.
                                 </p>
                                 <div class="mt-8">
-                                    <a href="{{ route('register.tenant') }}" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-[#F8FAFC] bg-[#38BDF8] hover:bg-[#22D3EE] transition-colors duration-200">
+                                    <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-[#F8FAFC] bg-[#38BDF8] hover:bg-[#22D3EE] transition-colors duration-200">
                                         Register Your Company
                                     </a>
                                 </div>

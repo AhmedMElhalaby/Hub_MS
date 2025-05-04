@@ -17,7 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web([
-            \App\Http\Middleware\ResolveTenant::class,
         ]);
         $middleware->api([
         ]);

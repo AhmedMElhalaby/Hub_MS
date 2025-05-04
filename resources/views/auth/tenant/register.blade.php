@@ -23,7 +23,7 @@
             <p class="text-sm text-gray-600">Create a new flow for your space</p>
         </div>
 
-        <form method="POST" action="{{ route('register.tenant.store') }}" class="flex flex-col gap-4">
+        <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-4">
             @csrf
 
             <!-- Space Name -->
@@ -165,12 +165,5 @@
                 Create Space
             </button>
         </form>
-
-        <p class="text-center text-sm text-gray-600">
-            Already have an account?
-            <a href="{{ route('login') }}" class="font-medium text-blue-600 hover:text-blue-700">
-                Sign in
-            </a>
-        </p>
     </div>
 </x-layouts.auth.card>

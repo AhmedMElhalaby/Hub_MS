@@ -25,7 +25,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public function login(): void
     {
         $this->validate();
-
         $this->ensureIsNotRateLimited();
         if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
@@ -38,7 +37,9 @@ new #[Layout('components.layouts.auth')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended( route('dashboard',['tenant'=>auth()->user()->tenant->id]),true);
+        // Get tenant from request and redirect using the current access method
+        $tenant = resolve_tenant_from_request();
+        $this->redirect(tenant_route('dashboard', [], true));
     }
 
     /**

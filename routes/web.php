@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\TenantRegistrationController;
+use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
-use Livewire\Volt\Volt;
 
 // Main domain routes
 Route::domain(config('app.url'))->group(function () {
@@ -11,10 +11,10 @@ Route::domain(config('app.url'))->group(function () {
     })->name('home');
 
     Route::get('/register/tenant', [TenantRegistrationController::class, 'create'])
-        ->name('register.tenant');
+        ->name('register');
 
     Route::post('/register/tenant', [TenantRegistrationController::class, 'store'])
-        ->name('register.tenant.store');
+        ->name('register.store');
 });
 
 // Shared tenant routes for both subdomain and prefix
@@ -23,11 +23,19 @@ $tenantRoutes = function () {
         return redirect()->route('dashboard', ['tenant' => request()->tenant]);
     });
 
+    // Guest routes
+    Route::middleware('guest')->group(function () {
+        Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'create'])
+            ->name('login');
+        Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'store']);
+
+    });
+
     Route::get('dashboard', App\Http\Controllers\DashboardController::class)
-        ->middleware(['auth', 'verified'])
+        ->middleware([Authenticate::class, 'verified'])
         ->name('dashboard');
 
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware([Authenticate::class])->group(function () {
         Route::redirect('settings', 'settings/profile');
         Route::get('/customers', App\Livewire\Customers\CustomersList::class)->name('customers.index');
         Route::get('/customers/{customer}', App\Livewire\Customers\CustomerDetails::class)->name('customers.show');
@@ -53,9 +61,6 @@ $tenantRoutes = function () {
         Route::get('/notifications', App\Livewire\Notifications\NotificationsList::class)->name('notifications.index');
         Route::post('logout', App\Livewire\Actions\Logout::class)->name('logout');
     });
-
-    Volt::route('login', 'auth.login')
-        ->name('login');
 };
 
 // Apply routes for subdomain access
@@ -68,4 +73,5 @@ Route::prefix('{tenant}')
     ->middleware([\App\Http\Middleware\ResolveTenant::class])
     ->group($tenantRoutes);
 
-require __DIR__.'/auth.php';
+// We don't need this anymore since auth routes are included in tenant routes
+// require __DIR__.'/auth.php';
