@@ -13,6 +13,7 @@ class Workspace extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
+        'tenant_id',
         'desk',
         'status'
     ];

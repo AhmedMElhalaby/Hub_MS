@@ -4,11 +4,11 @@ namespace App\Livewire\Bookings;
 
 use App\Enums\BookingStatus;
 use App\Enums\PlanType;
+use App\Models\Customer;
 use App\Repositories\BookingRepository;
 use App\Services\NotificationService;
 use Livewire\Component;
 use App\Traits\WithModal;
-use App\Models\Customer;
 use App\Models\Plan;
 use App\Models\Workspace;
 use Carbon\Carbon;
@@ -18,6 +18,9 @@ class CreateBooking extends Component
 {
     use WithModal, NotificationService;
 
+    public $plans = [];
+    public $customers = [];
+    public $workspaces = [];
     public $customerId;
     public $workspaceId;
     public $planId;
@@ -29,7 +32,10 @@ class CreateBooking extends Component
 
     public function mount()
     {
-        $this->startedAt = now()->format('Y-m-d\TH:i');
+        // This will automatically apply the tenant scope from the BelongsToTenant trait
+        $this->plans = Plan::all();
+        $this->customers = Customer::all();
+        $this->workspaces = Workspace::available()->get();
     }
 
     public function updatedPlanId()
@@ -119,17 +125,14 @@ class CreateBooking extends Component
             $this->dispatch('booking-created');
             $this->notifySuccess('messages.booking.created');
         } catch (\Exception $e) {
+            $this->notifyError($e->getMessage());
             $this->notifyError('messages.booking.save_error');
         }
     }
 
     public function render()
     {
-        return view('livewire.bookings.create-booking', [
-            'customers' => Customer::all(),
-            'workspaces' => Workspace::available()->get(),
-            'plans' => Plan::all()
-        ]);
+        return view('livewire.bookings.create-booking');
     }
 
     #[On('open-create-booking')]

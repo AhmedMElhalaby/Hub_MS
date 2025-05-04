@@ -15,6 +15,7 @@ class Customer extends Model
     use HasFactory,Notifiable,BelongsToTenant;
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'email',
         'mobile',

@@ -22,6 +22,7 @@ class EditBooking extends Component
     public $bookingId;
     public $customerId;
     public $workspaceId;
+    public $customers = [];
     public $plans = [];
     public $planId;
     public $startedAt;
@@ -38,6 +39,7 @@ class EditBooking extends Component
                 ->orWhere('id', $this->booking->workspace_id);
         })->get();
         $this->plans = Plan::all();
+        $this->customers = Customer::all();
     }
 
     public function boot(BookingRepository $bookingRepository)
@@ -125,11 +127,7 @@ class EditBooking extends Component
 
     public function render()
     {
-        return view('livewire.bookings.edit-booking', [
-            'customers' => Customer::all(),
-            'workspaces' => $this->workspaces,
-            'plans' => $this->plans
-        ]);
+        return view('livewire.bookings.edit-booking');
     }
 
     #[On('open-edit-booking')]

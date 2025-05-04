@@ -13,6 +13,7 @@ class Plan extends Model
     use HasFactory,BelongsToTenant;
 
     protected $fillable = [
+        'tenant_id',
         'type',
         'price',
         'mikrotik_profile',
