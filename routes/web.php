@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\TenantRegistrationController;
 use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 
 // Main domain routes
 Route::domain(config('app.url'))->group(function () {
@@ -49,7 +50,11 @@ Route::domain('{tenant}.'.config('app.url'))->middleware([\App\Http\Middleware\R
         Route::get('/users/{user}', App\Livewire\Users\UserDetails::class)->name('users.show');
         Route::get('/finances', App\Livewire\Finances\FinancesList::class)->name('finances.index');
         Route::get('/notifications', App\Livewire\Notifications\NotificationsList::class)->name('notifications.index');
+        Route::post('logout', App\Livewire\Actions\Logout::class)->name('logout');
     });
+    Volt::route('login', 'auth.login')
+    ->name('login');
+
 });
 
 require __DIR__.'/auth.php';

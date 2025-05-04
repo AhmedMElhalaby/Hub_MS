@@ -7,6 +7,7 @@ use Livewire\Component;
 
 class Mikrotik extends Component
 {
+    public bool $showScript = false;
     public bool $mikrotikEnabled = false;
     public string $mikrotikHost = '';
     public string $mikrotikUser = '';

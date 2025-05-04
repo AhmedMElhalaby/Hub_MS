@@ -65,6 +65,12 @@ class FinancesList extends Component
                     case 'month':
                         $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
                         break;
+                    case 'last_month':
+                        $query->whereBetween('created_at', [
+                            now()->subMonth()->startOfMonth(),
+                            now()->subMonth()->endOfMonth()
+                        ]);
+                        break;
                 }
             });
 
@@ -230,6 +236,12 @@ class FinancesList extends Component
                         break;
                     case 'month':
                         $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+                        break;
+                    case 'last_month':
+                        $query->whereBetween('created_at', [
+                            now()->subMonth()->startOfMonth(),
+                            now()->subMonth()->endOfMonth()
+                        ]);
                         break;
                 }
             })->get();

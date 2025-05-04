@@ -75,6 +75,7 @@
             <option value="today">{{ __('Today') }}</option>
             <option value="week">{{ __('This Week') }}</option>
             <option value="month">{{ __('This Month') }}</option>
+            <option value="last_month">{{ __('Last Month') }}</option>
         </flux:select>
     </div>
 

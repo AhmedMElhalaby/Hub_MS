@@ -45,6 +45,15 @@
                         @endif
                     </button>
                 </flux:table.head>
+                <flux:table.head>
+                    <button wire:click="sortBy('created_at')" class="flex items-center space-x-1">
+                        <span>{{ __('Created At') }}</span>
+                        @if ($sortField === 'created_at')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}"
+                                class="size-4" />
+                        @endif
+                    </button>
+                </flux:table.head>
                 <flux:table.head>{{ __('Actions') }}</flux:table.head>
             </x-slot:header>
 
@@ -53,6 +62,7 @@
                     <flux:table.row wire:key="{{ $expense->id }}">
                         <flux:table.cell>{{ $expense->category->label() }}</flux:table.cell>
                         <flux:table.cell>{{ number_format($expense->amount, 2) }}</flux:table.cell>
+                        <flux:table.cell>{{ $expense->created_at->format('M d, Y H:i') }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
                                 <flux:button wire:navigate href="{{ tenant_route('expenses.show', $expense) }}" size="sm">
@@ -69,7 +79,7 @@
                     </flux:table.row>
                 @empty
                     <flux:table.row>
-                        <flux:table.cell colspan="3" class="text-center">
+                        <flux:table.cell colspan="4" class="text-center">
                             {{ __('No expenses found.') }}
                         </flux:table.cell>
                     </flux:table.row>
