@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 
 class ResolveTenant
 {
@@ -27,12 +26,20 @@ class ResolveTenant
             abort(403, 'Tenant is inactive');
         }
 
+        // Store the access method (subdomain or prefix) in the request
+        $request->accessMethod = $this->isSubdomainRequest($request) ? 'subdomain' : 'prefix';
+
         app()->instance('tenant', $tenant);
         return $next($request);
     }
 
     private function getTenantIdentifier(Request $request): ?string
     {
+        // If using prefix route parameter (e.g. domain.com/tenant)
+        if ($request->route('tenant')) {
+            return $request->route('tenant');
+        }
+
         // Check if request is using subdomain
         $host = $request->getHost();
         $parts = explode('.', $host);
@@ -42,11 +49,13 @@ class ResolveTenant
             return $parts[0];
         }
 
-        // If using prefix route parameter (e.g. domain.com/tenant)
-        if ($request->route('tenant')) {
-            return $request->route('tenant');
-        }
-
         return null;
+    }
+
+    private function isSubdomainRequest(Request $request): bool
+    {
+        $host = $request->getHost();
+        $parts = explode('.', $host);
+        return count($parts) >= 3;
     }
 }
