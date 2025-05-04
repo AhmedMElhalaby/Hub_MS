@@ -6,33 +6,47 @@ use Closure;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\URL;
 
 class ResolveTenant
 {
     public function handle(Request $request, Closure $next)
     {
-        $host = $request->getHost();
+        // Get tenant identifier either from subdomain or route parameter
+        $tenantIdentifier = $this->getTenantIdentifier($request);
 
-        // Extract subdomain from the host
-        $parts = explode('.', $host);
-        if (count($parts) >= 3) {
-            $subdomain = $parts[0];
-        } else {
-            abort(404, 'Invalid tenant domain');
+        if (!$tenantIdentifier) {
+            abort(404, 'Invalid tenant identifier');
         }
 
-        // Find tenant by subdomain
+        // Find tenant by domain
         $tenant = Tenant::with('settings')
-            ->where('domain', $subdomain)
+            ->where('domain', $tenantIdentifier)
             ->firstOrFail();
 
         if (!$tenant->active) {
             abort(403, 'Tenant is inactive');
         }
 
-        // Config::set('database.connections.tenant.database', $tenant->database);
         app()->instance('tenant', $tenant);
         return $next($request);
+    }
+
+    private function getTenantIdentifier(Request $request): ?string
+    {
+        // Check if request is using subdomain
+        $host = $request->getHost();
+        $parts = explode('.', $host);
+
+        // If using subdomain (e.g. tenant.domain.com)
+        if (count($parts) >= 3) {
+            return $parts[0];
+        }
+
+        // If using prefix route parameter (e.g. domain.com/tenant)
+        if ($request->route('tenant')) {
+            return $request->route('tenant');
+        }
+
+        return null;
     }
 }
