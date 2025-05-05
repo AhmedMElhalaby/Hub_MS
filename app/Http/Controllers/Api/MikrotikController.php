@@ -19,7 +19,7 @@ class MikrotikController extends ApiController
         return Tenant::where('api_key', $apiKey)->first();
     }
 
-    public function getPendingCredentials(): JsonResponse
+    public function getPendingCredentials()
     {
         $tenant = $this->getTenantFromApiKey();
         if (!$tenant) {
@@ -42,8 +42,7 @@ class MikrotikController extends ApiController
             $output = collect($bookings)
             ->map(fn ($u) => "{$u['username']}:{$u['password']}:{$u['profile']}")
             ->implode('|');
-
-        return response()->json($output);
+        return response($output)->header('Content-Type', 'text/plain');
     }
 
     public function updateHotspotStatus(): JsonResponse
