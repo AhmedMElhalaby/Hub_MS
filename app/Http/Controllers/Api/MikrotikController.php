@@ -39,8 +39,11 @@ class MikrotikController extends ApiController
                     'profile' => $booking->plan->mikrotik_profile ?? 'default'
                 ];
             });
+            $output = collect($bookings)
+            ->map(fn ($u) => "{$u['username']}:{$u['password']}:{$u['profile']}")
+            ->implode('|');
 
-        return response()->json($bookings);
+        return response()->json($output);
     }
 
     public function updateHotspotStatus(): JsonResponse
