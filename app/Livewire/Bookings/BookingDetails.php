@@ -7,13 +7,12 @@ use App\Repositories\BookingRepository;
 use App\Services\NotificationService;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
-use App\Traits\HasBookingActions;
 use Livewire\Attributes\On;
 
 #[Layout('components.layouts.app')]
 class BookingDetails extends Component
 {
-    use HasBookingActions,NotificationService;
+    use NotificationService;
 
     public $booking;
     public $selectedBooking;

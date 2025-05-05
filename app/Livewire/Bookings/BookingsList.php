@@ -11,13 +11,13 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use App\Traits\WithSorting;
-use App\Traits\HasBookingActions;
+use App\Traits\WithTenantContext;
 use Livewire\Attributes\On;
 
 #[Layout('components.layouts.app')]
 class BookingsList extends Component
 {
-    use WithPagination, WithModal, WithSorting, HasBookingActions, NotificationService;
+    use WithPagination, WithModal, WithSorting, NotificationService, WithTenantContext;
 
     protected BookingRepository $bookingRepository;
 

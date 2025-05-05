@@ -138,6 +138,7 @@ class CreateBooking extends Component
     #[On('open-create-booking')]
     public function open()
     {
-        $this->showModal = true;
+        $this->startedAt = Carbon::now()->format('Y-m-d\TH:i');
+        $this->openModal();
     }
 }
