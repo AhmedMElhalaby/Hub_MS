@@ -123,12 +123,14 @@ class Booking extends Model
                 return '00:00:00';
         }
 
-        $hours = floor($seconds / 3600);
+        $days = floor($seconds / 86400);
+        $hours = floor(($seconds % 86400) / 3600);
         $minutes = floor(($seconds % 3600) / 60);
         $remainingSeconds = $seconds % 60;
 
         return sprintf(
-            '%02d:%02d:%02d',
+            '%dd %02d:%02d:%02d',
+            $days,
             $hours,
             $minutes,
             $remainingSeconds
