@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\MikrotikProfile;
 use App\Models\Tenant;
@@ -28,6 +29,7 @@ class MikrotikController extends ApiController
 
         $bookings = Booking::where('hotspot_is_created', 0)
             ->where('tenant_id', $tenant->id)
+            ->where('status',BookingStatus::Confirmed)
             ->whereNotNull('hotspot_username')
             ->whereNotNull('hotspot_password')
             ->with(['plan'])
