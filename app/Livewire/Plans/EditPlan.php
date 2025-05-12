@@ -7,9 +7,8 @@ use App\Services\NotificationService;
 use Livewire\Component;
 use App\Traits\WithModal;
 use App\Enums\PlanType;
+use App\Models\MikrotikProfile;
 use App\Models\Setting;
-use App\Services\MikrotikService;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Enum;
 use Livewire\Attributes\On;
 
@@ -33,15 +32,9 @@ class EditPlan extends Component
     public function mount()
     {
         if (Setting::get('mikrotik_enabled')) {
-            try {
-                $mikrotik = new MikrotikService();
-                $this->availableProfiles = collect($mikrotik->getHotspotProfiles())
-                    ->pluck('name')
-                    ->toArray();
-            } catch (\Exception $e) {
-                Log::error('Failed to fetch Mikrotik profiles', ['error' => $e->getMessage()]);
-                $this->availableProfiles = [];
-            }
+            $this->availableProfiles = MikrotikProfile::where('tenant_id', app()->get('tenant')->id)
+            ->pluck('name')
+            ->toArray();
         }
     }
 

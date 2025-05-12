@@ -31,7 +31,7 @@ class CreatePlan extends Component
     public function mount()
     {
         if (Setting::get('mikrotik_enabled')) {
-            $this->availableProfiles = MikrotikProfile::where('tenant_id', auth()->user()->tenant_id)
+            $this->availableProfiles = MikrotikProfile::where('tenant_id', app()->get('tenant')->id)
                 ->pluck('name')
                 ->toArray();
         }
