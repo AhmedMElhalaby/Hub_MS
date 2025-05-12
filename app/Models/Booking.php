@@ -111,26 +111,24 @@ class Booking extends Model
                 $seconds = $duration * 3600;
                 break;
             case PlanType::Daily:
-                $seconds = $duration * 86400;
+                $seconds = $duration * (8 * 3600); // 8 hours per day
                 break;
             case PlanType::Weekly:
-                $seconds = $duration * 604800;
+                $seconds = $duration * (6 * 8 * 3600); // 6 days * 8 hours per day
                 break;
             case PlanType::Monthly:
-                $seconds = $duration * 2592000;
+                $seconds = $duration * (26 * 8 * 3600); // 26 days * 8 hours per day
                 break;
             default:
-                return '0d 00:00:00';
+                return '00:00:00';
         }
 
-        $days = floor($seconds / 86400);
-        $hours = floor(($seconds % 86400) / 3600);
+        $hours = floor($seconds / 3600);
         $minutes = floor(($seconds % 3600) / 60);
         $remainingSeconds = $seconds % 60;
 
         return sprintf(
-            '%dd %02d:%02d:%02d',
-            $days,
+            '%02d:%02d:%02d',
             $hours,
             $minutes,
             $remainingSeconds
