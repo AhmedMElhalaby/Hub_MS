@@ -1,0 +1,51 @@
+:global fetchedUserList
+
+:log info "[CREATE USERS] Script started"
+
+# Split the fetchedUserList by | to get array of entries
+:local entries [:toarray ($fetchedUserList)]
+
+:foreach entry in=$entries do={
+    :if ([:len $entry] = 0) do={
+        :log warning "[CREATE USERS] Empty entry skipped"
+    } else={
+        :local u1 [:find $entry ":" 0]
+        :local u2 [:find $entry ":" ($u1 + 1)]
+
+        :if ($u1 != -1 && $u2 != -1) do={
+            :local username [:pick $entry 0 $u1]
+            :local password [:pick $entry ($u1 + 1) $u2]
+            :local profile  [:pick $entry ($u2 + 1) [:len $entry]]
+
+            :log info ("[CREATE USERS] Parsed: $username | $profile")
+
+            :local profileId [/ip hotspot user profile find where name=$profile]
+            :if ([:len $profileId] = 0) do={
+                :log warning ("[CREATE USERS] Profile not found: $profile — skipping $username")
+            } else={
+                :local exists false
+                :foreach u in=[/ip hotspot user find] do={
+                    :if ([/ip hotspot user get $u name] = $username) do={
+                        :set exists true
+                    }
+                }
+
+                :if (!$exists) do={
+                    /ip hotspot user add name=$username password=$password profile=$profile disabled=no
+                    :log info ("[CREATE USERS] User created: $username")
+
+                    # Call update status script with parameter
+                    :global updateUsername $username
+                    /system script run update-status
+                    :set updateUsername ""
+                } else={
+                    :log warning ("[CREATE USERS] User exists: $username — skipped")
+                }
+            }
+        } else={
+            :log warning ("[CREATE USERS] Invalid format: $entry")
+        }
+    }
+}
+
+:log info "[CREATE USERS] Finished processing all entries"

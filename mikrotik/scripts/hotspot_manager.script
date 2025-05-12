@@ -1,0 +1,46 @@
+:global fetchedUserList; :local baseUrl "https://hub-ms-development-bl2e5g.laravel.cloud"; :local apiKey "6KiD6bKbh80daNOib8fx9QBTphTSPitb"
+
+# Sync Profiles First
+:do {
+    :local profileJson ""
+    :set profileJson "{\"profiles\":["
+    :local count 0
+    :foreach p in=[/ip hotspot user profile find] do={
+        :local profileName [/ip hotspot user profile get $p name]
+        :if ($count > 0) do={:set profileJson ($profileJson . ",")}
+        :set profileJson ($profileJson . "{\"name\":\"" . $profileName . "\"}")
+        :set count ($count + 1)
+    }
+    :set profileJson ($profileJson . "]}")
+    :local syncHeaders {"X-API-Key: $apiKey\r\nContent-Type: application/json"}
+    /tool fetch url=($baseUrl . "/api/mikrotik/profiles/sync") http-method=post http-data=$profileJson http-header-field=$syncHeaders output=none
+    :log info "[SYNC] Profiles synced successfully"
+} on-error={:log error "[SYNC] Failed to sync profiles"}
+
+# Fetch pending credentials
+:do {
+    :local Response [/tool fetch url=($baseUrl . "/api/mikrotik/pending-credentials") http-method=get http-header-field=("X-API-Key: " . $apiKey) output=user mode=http as-value]; :local data ($Response->"data"); :set fetchedUserList $data; :log info "[FETCH] Users fetched successfully"
+} on-error={:log error "[FETCH] Failed to fetch users"}
+
+# Process and create users
+:if ([:len $fetchedUserList] > 0) do={
+    :local entries [:toarray ($fetchedUserList)]; :foreach entry in=$entries do={
+        :if ([:len $entry] > 0) do={
+            :local u1 [:find $entry ":" 0]; :local u2 [:find $entry ":" ($u1 + 1)]
+            :if ($u1 != -1 && $u2 != -1) do={
+                :local username [:pick $entry 0 $u1]; :local password [:pick $entry ($u1 + 1) $u2]
+                :local profile [:pick $entry ($u2 + 1) [:len $entry]]
+                :local exists false; :foreach u in=[/ip hotspot user find] do={:if ([/ip hotspot user get $u name] = $username) do={:set exists true}}
+                :if (!$exists) do={
+                    /ip hotspot user add name=$username password=$password profile=$profile disabled=no
+                    :log info ("[CREATE] User created: $username")
+                    # Update status
+                    :do {
+                        :local StatusResponse [/tool fetch url=($baseUrl . "/api/mikrotik/bookings/status") http-method=post http-header-field=("X-API-Key: " . $apiKey,"Content-Type: application/json") http-data=("{\"username\":\"" . $username . "\"}") output=user as-value]
+                        :log info ("[UPDATE] Status updated for user: $username")
+                    } on-error={:log error ("[UPDATE] Failed to update status for user: $username")}
+                } else={:log warning ("[CREATE] User exists: $username")}
+            } else={:log warning ("[CREATE] Invalid format: $entry")}
+        }
+    }
+}

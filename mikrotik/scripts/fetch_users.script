@@ -1,0 +1,29 @@
+:global fetchedUserList
+
+:local baseUrl "https://hub-ms-development-bl2e5g.laravel.cloud"
+:local apiKey "6KiD6bKbh80daNOib8fx9QBTphTSPitb"
+:local endpoint "/api/mikrotik/pending-credentials"
+
+:local Response
+
+:do {
+    :set Response [/tool fetch url=($baseUrl . $endpoint) \
+        http-method=get \
+        http-header-field=("X-API-Key: " . $apiKey) \
+        output=user mode=http as-value]
+
+    # Get the data from the response
+    :local data ($Response->"data")
+
+    # Set the global variable with the formatted string
+    :set fetchedUserList $data
+
+    :log info "[FETCH THE USERS] Fetch executed successfully"
+    :log info ("[FETCH THE USERS] Fetched users: " . $fetchedUserList)
+
+} on-error={
+    :log error ("[FETCH THE USERS] Fetch failed: " . $message)
+    :return
+}
+
+/system script run create-users

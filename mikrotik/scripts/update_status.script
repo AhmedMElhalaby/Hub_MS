@@ -1,0 +1,28 @@
+:global updateUsername
+:local username $updateUsername
+:local baseUrl "https://hub-ms-development-bl2e5g.laravel.cloud"
+:local apiKey "6KiD6bKbh80daNOib8fx9QBTphTSPitb"
+:local endpoint "/api/mikrotik/bookings/status"
+
+:if ([:len $username] = 0) do={
+    :log error "[UPDATE STATUS] No username provided"
+    :return
+}
+
+:do {
+    :local Response [/tool fetch url=($baseUrl . $endpoint) \
+        http-method=post \
+        http-header-field=("X-API-Key: " . $apiKey,"Content-Type: application/json") \
+        http-data=("{\"username\":\"" . $username . "\"}") \
+        output=user as-value]
+
+    :local status ($Response->"status")
+    :if ($status = "finished") do={
+        :log info ("[UPDATE STATUS] Status updated successfully for user: $username")
+    } else={
+        :log warning ("[UPDATE STATUS] Unexpected status for user: $username, status: $status")
+    }
+} on-error={
+    :log error ("[UPDATE STATUS] Failed to update status for user: $username")
+    :log error ("[UPDATE STATUS] Error details: " . [:tostr [/error get]])
+}

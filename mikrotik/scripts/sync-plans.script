@@ -1,0 +1,32 @@
+:local baseUrl "https://hub-ms-development-bl2e5g.laravel.cloud"
+:local apiKey "6KiD6bKbh80daNOib8fx9QBTphTSPitb"
+
+:local json "{\"profiles\": ["
+:local count 0
+
+# Loop over hotspot user profiles
+:foreach p in=[/ip hotspot user profile find] do={
+    :local profileName [/ip hotspot user profile get $p name]
+
+    :if ($count > 0) do={
+        :set json ($json . ",")
+    }
+
+    :set json ($json . "{\"name\": \"" . $profileName . "\"}")
+    :set count ($count + 1)
+}
+
+:set json ($json . "]}")
+
+  # Combine headers as raw string (simulate actual HTTP format)
+  :local headers ("X-API-Key: " . $apiKey . "\r\nContent-Type: application/json")
+
+  :log info "🔁 Sending profile sync with headers..."
+
+  /tool fetch url=($baseUrl . "/api/mikrotik/profiles/sync") \
+      http-method=post \
+      http-data=$json \
+      http-header-field=$headers \
+      output=none
+
+  :log info "Request sent"
