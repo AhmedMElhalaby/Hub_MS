@@ -3,7 +3,6 @@
 namespace App\Livewire\Expenses;
 
 use App\Repositories\ExpenseRepository;
-use App\Services\NotificationService;
 use App\Traits\WithSorting;
 use App\Enums\ExpenseCategory;
 use Livewire\Component;
@@ -14,7 +13,7 @@ use Livewire\Attributes\On;
 #[Layout('components.layouts.app')]
 class ExpensesList extends Component
 {
-    use WithPagination, WithSorting, NotificationService;
+    use WithPagination, WithSorting;
 
     public $search = '';
     public $categoryFilter = '';
@@ -46,5 +45,11 @@ class ExpensesList extends Component
     public function refresh()
     {
         $this->render();
+    }
+
+    public function mount()
+    {
+        $this->sortField = 'created_at';
+        $this->sortDirection = 'desc';
     }
 }
