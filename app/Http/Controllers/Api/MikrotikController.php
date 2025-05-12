@@ -44,7 +44,7 @@ class MikrotikController extends ApiController
                 ];
             });
             $output = collect($bookings)
-            ->map(fn ($u) => "{$u['username']}:{$u['password']}:{$u['profile']}:{$u['limit-uptime']}")
+            ->map(fn ($u) => "{$u['username']}~{$u['password']}~{$u['profile']}~{$u['limit-uptime']}")
             ->implode('|');
         return response($output)->header('Content-Type', 'text/plain');
     }
