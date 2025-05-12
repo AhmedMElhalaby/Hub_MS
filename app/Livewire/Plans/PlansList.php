@@ -3,7 +3,6 @@
 namespace App\Livewire\Plans;
 
 use App\Repositories\PlanRepository;
-use App\Services\NotificationService;
 use App\Traits\WithModal;
 use App\Traits\WithSorting;
 use App\Enums\PlanType;
@@ -15,7 +14,9 @@ use Livewire\Attributes\On;
 #[Layout('components.layouts.app')]
 class PlansList extends Component
 {
-    use WithPagination, WithSorting, WithModal, NotificationService;
+    use WithPagination, WithSorting, WithModal;
+
+    public $search = '';
 
     protected PlanRepository $planRepository;
 
@@ -41,5 +42,11 @@ class PlansList extends Component
     public function refresh()
     {
         $this->render();
+    }
+
+    public function mount()
+    {
+        $this->sortField = 'created_at';
+        $this->sortDirection = 'desc';
     }
 }

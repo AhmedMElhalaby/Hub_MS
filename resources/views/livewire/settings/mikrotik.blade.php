@@ -1,5 +1,12 @@
 @php
     use App\Models\Tenant;
+
+    $scriptContent = file_get_contents(base_path('mikrotik/scripts/integration.script'));
+    $scriptContent = str_replace(
+        ['{{ config(\'app.url\') }}', '{{ auth()->user()->tenant->api_key }}'],
+        [config('app.url'), auth()->user()->tenant->api_key],
+        $scriptContent
+    );
 @endphp
 <section class="w-full" x-data="{ showScript: false }">
     <x-settings.layout heading="{{ __('Mikrotik Settings') }}" subheading="{{ __('Configure Mikrotik integration settings') }}">
@@ -17,32 +24,6 @@
                         </div>
                         <span class="ms-3 text-sm font-medium text-zinc-700 dark:text-zinc-200">{{ __('Enable Mikrotik Integration') }}</span>
                     </label>
-                </div>
-
-                <div x-show="$wire.mikrotikEnabled"
-                     x-cloak
-                     class="space-y-6">
-                    <flux:input
-                        wire:model="mikrotikHost"
-                        label="{{ __('Mikrotik Host') }}"
-                    />
-
-                    <flux:input
-                        wire:model="mikrotikUser"
-                        label="{{ __('Mikrotik Username') }}"
-                    />
-
-                    <flux:input
-                        wire:model="mikrotikPassword"
-                        type="password"
-                        label="{{ __('Mikrotik Password') }}"
-                    />
-
-                    <flux:input
-                        wire:model="mikrotikPort"
-                        type="number"
-                        label="{{ __('Mikrotik Port') }}"
-                    />
                 </div>
 
                 <div class="flex items-center gap-4">
@@ -69,50 +50,7 @@
                         {{ __('Add this script to your Mikrotik device to enable integration with the system.') }}
                     </p>
                     <div class="relative">
-                        <pre class="bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-sm font-mono">:local baseUrl "{{ config('app.url') }}";
-:local apiKey "{{ auth()->user()->tenant->api_key }}";
-
-:log info "Fetching pending credentials...";
-/tool fetch url=($baseUrl . "/api/mikrotik/pending-credentials") \
-    http-method=get \
-    http-header-field=("X-API-Key: " . $apiKey) \
-    output=user as-value mode=http;
-
-:local result $"data";
-:if ([:typeof $result] = "string") do={
-    :log warning "Invalid response format";
-} else={
-    :foreach user in=$result do={
-        :local username ($user->"username");
-        :local password ($user->"password");
-        :local profile ($user->"profile");
-
-        /ip hotspot user add name=$username password=$password profile=$profile disabled=no;
-        :log info ("User added: $username");
-
-        :local payload ("{\"username\": \"" . $username . "\"}");
-        :local headers ("X-API-Key: " . $apiKey . ";Content-Type: application/json");
-
-        /tool fetch url=($baseUrl . "/api/mikrotik/bookings/status") \
-            http-method=post \
-            http-data=$payload \
-            http-header-field=$headers \
-            output=none;
-
-        :log info ("Status updated for: $username");
-    };
-};
-
-:local profileData "{\"profiles\": [{\"name\": \"profile1\"}, {\"name\": \"profile2\"}]}";
-:local syncHeaders ("X-API-Key: " . $apiKey . ";Content-Type: application/json");
-
-/tool fetch url=($baseUrl . "/api/mikrotik/profiles/sync") \
-    http-method=post \
-    http-data=$profileData \
-    http-header-field=$syncHeaders \
-    output=none;
-
-:log info "Profiles synced successfully";</pre>
+                        <pre class="bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-sm font-mono">{{ $scriptContent }}</pre>
                         <button
                             class="absolute top-2 right-2 p-2 text-zinc-400 hover:text-zinc-100 transition-colors"
                             @click="navigator.clipboard.writeText($el.previousElementSibling.textContent); $dispatch('notify', { message: '{{ __('Script copied to clipboard!') }}' })"

@@ -26,6 +26,12 @@ class WorkspacesList extends Component
         $this->workspaceRepository = $workspaceRepository;
     }
 
+    public function mount()
+    {
+        $this->sortField = 'created_at';
+        $this->sortDirection = 'desc';
+    }
+    
     protected function getQueryString(): array
     {
         return array_merge(parent::getQueryString(), [
