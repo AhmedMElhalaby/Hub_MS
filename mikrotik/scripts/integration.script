@@ -26,14 +26,17 @@
 :if ([:len $fetchedUserList] > 0) do={
     :local entries [:toarray ($fetchedUserList)]; :foreach entry in=$entries do={
         :if ([:len $entry] > 0) do={
-            :local u1 [:find $entry ":" 0]; :local u2 [:find $entry ":" ($u1 + 1)]
-            :if ($u1 != -1 && $u2 != -1) do={
-                :local username [:pick $entry 0 $u1]; :local password [:pick $entry ($u1 + 1) $u2]
-                :local profile [:pick $entry ($u2 + 1) [:len $entry]]
-                :local exists false; :foreach u in=[/ip hotspot user find] do={:if ([/ip hotspot user get $u name] = $username) do={:set exists true}}
+            :local u1 [:find $entry ":" 0]; :local u2 [:find $entry ":" ($u1 + 1)]; :local u3 [:find $entry ":" ($u2 + 1)]
+            :if ($u1 != -1 && $u2 != -1 && $u3 != -1) do={
+                :local username [:pick $entry 0 $u1]
+                :local password [:pick $entry ($u1 + 1) $u2]
+                :local profile [:pick $entry ($u2 + 1) $u3]
+                :local uptime [:pick $entry ($u3 + 1) [:len $entry]]
+                :local exists false
+                :foreach u in=[/ip hotspot user find] do={:if ([/ip hotspot user get $u name] = $username) do={:set exists true}}
                 :if (!$exists) do={
-                    /ip hotspot user add name=$username password=$password profile=$profile disabled=no
-                    :log info ("[CREATE] User created: $username")
+                    /ip hotspot user add name=$username password=$password profile=$profile limit-uptime=$uptime disabled=no
+                    :log info ("[CREATE] User created: $username with uptime limit: $uptime")
                     # Update status
                     :do {
                         :local StatusResponse [/tool fetch url=($baseUrl . "/api/mikrotik/bookings/status") http-method=post http-header-field=("X-API-Key: " . $apiKey,"Content-Type: application/json") http-data=("{\"username\":\"" . $username . "\"}") output=user as-value]

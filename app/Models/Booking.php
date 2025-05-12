@@ -101,4 +101,39 @@ class Booking extends Model
                 return 1;
         }
     }
+
+    public function calculateUptimeLimit(): string
+    {
+        $duration = $this->getDurationFromDates();
+
+        switch ($this->plan->type) {
+            case PlanType::Hourly:
+                $seconds = $duration * 3600;
+                break;
+            case PlanType::Daily:
+                $seconds = $duration * 86400;
+                break;
+            case PlanType::Weekly:
+                $seconds = $duration * 604800;
+                break;
+            case PlanType::Monthly:
+                $seconds = $duration * 2592000;
+                break;
+            default:
+                return '0d 00:00:00';
+        }
+
+        $days = floor($seconds / 86400);
+        $hours = floor(($seconds % 86400) / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $remainingSeconds = $seconds % 60;
+
+        return sprintf(
+            '%dd %02d:%02d:%02d',
+            $days,
+            $hours,
+            $minutes,
+            $remainingSeconds
+        );
+    }
 }

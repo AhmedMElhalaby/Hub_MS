@@ -33,14 +33,16 @@ class MikrotikController extends ApiController
             ->with(['plan'])
             ->get()
             ->map(function ($booking) {
+                $timeLimit = $booking->ended_at->diffInSeconds(now());
                 return [
                     'username' => $booking->hotspot_username,
                     'password' => $booking->hotspot_password,
-                    'profile' => $booking->plan->mikrotik_profile ?? 'default'
+                    'profile' => $booking->plan->mikrotik_profile ?? 'default',
+                    'limit-uptime' => $booking->calculateUptimeLimit()
                 ];
             });
             $output = collect($bookings)
-            ->map(fn ($u) => "{$u['username']}:{$u['password']}:{$u['profile']}")
+            ->map(fn ($u) => "{$u['username']}:{$u['password']}:{$u['profile']}:{$u['limit-uptime']}")
             ->implode('|');
         return response($output)->header('Content-Type', 'text/plain');
     }
