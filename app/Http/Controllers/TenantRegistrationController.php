@@ -24,7 +24,7 @@ class TenantRegistrationController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'domain' => ['required', 'string', 'max:255', 'unique:tenants,domain', 'regex:/^[a-z0-9-]+$/'],
             'admin_name' => ['required', 'string', 'max:255'],
-            'admin_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'admin_email' => ['required', 'string', 'email', 'max:255'],
             'admin_password' => ['required', Password::defaults()],
         ], [
             'domain.regex' => 'The domain may only contain lowercase letters, numbers, and hyphens.'
