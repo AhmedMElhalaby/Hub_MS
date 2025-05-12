@@ -22,7 +22,7 @@ class FinancesList extends Component
     public $typeFilter = '';
     public $dateFilter = '';
     public $paymentMethodFilter = '';
-    public $statusFilter = '';  // Add status filter property
+    public $statusFilter = '';
     public $selectedFinance;
     public $showVoidModal = false;
     public $showExportModal = false;
@@ -189,6 +189,9 @@ class FinancesList extends Component
 
     public function mount()
     {
+        $this->sortField = 'created_at'; // Set default sort field
+        $this->sortDirection = 'desc'; // Set default sort direction
+
         // Default selected columns
         $this->selectedColumns = [
             'type',
