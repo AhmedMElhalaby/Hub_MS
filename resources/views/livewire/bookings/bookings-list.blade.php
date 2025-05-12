@@ -99,9 +99,9 @@
             <x-slot:body>
                 @forelse($bookings as $booking)
                     <flux:table.row wire:key="{{ $booking->id }}">
-                        <flux:table.cell>{{ $booking->customer->name }}</flux:table.cell>
-                        <flux:table.cell>Desk {{ $booking->workspace->desk }}</flux:table.cell>
-                        <flux:table.cell>{{ $booking->plan->type->label() }}</flux:table.cell>
+                        <flux:table.cell>{{ $booking->customer?->name }}</flux:table.cell>
+                        <flux:table.cell>Desk {{ $booking->workspace?->desk }}</flux:table.cell>
+                        <flux:table.cell>{{ $booking->plan?->type->label() }}</flux:table.cell>
                         <flux:table.cell>{{ $booking->started_at->format('Y-m-d h:i A') }} - {{ $booking->ended_at->format('Y-m-d h:i A') }}</flux:table.cell>
                         <flux:table.cell>
                             <flux:badge color="{{ $booking->status->color() }}">

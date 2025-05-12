@@ -20,7 +20,7 @@ Route::domain(config('app.url'))->group(function () {
 // Shared tenant routes for both subdomain and prefix
 $tenantRoutes = function () {
     Route::get('/', function() {
-        return redirect()->route('dashboard', ['tenant' => request()->tenant]);
+        return redirect()->to(tenant_route('dashboard'));
     });
 
     // Guest routes
@@ -62,16 +62,18 @@ $tenantRoutes = function () {
         Route::post('logout', App\Livewire\Actions\Logout::class)->name('logout');
     });
 };
-
-// Apply routes for subdomain access
-Route::domain('{tenant}.'.config('app.url'))
-    ->middleware([\App\Http\Middleware\ResolveTenant::class])
-    ->group($tenantRoutes);
-
 // Apply same routes for prefix access on main domain
 Route::prefix('{tenant}')
     ->middleware([\App\Http\Middleware\ResolveTenant::class])
+    ->name('prefix.')
     ->group($tenantRoutes);
+// Apply routes for subdomain access
+Route::domain('{tenant}.'.config('app.url'))
+    ->middleware([\App\Http\Middleware\ResolveTenant::class])
+    ->name('subdomain.')
+    ->group($tenantRoutes);
+
+
 
 // We don't need this anymore since auth routes are included in tenant routes
 // require __DIR__.'/auth.php';

@@ -60,18 +60,6 @@ if (!function_exists('get_tenant_domain')) {
                 return $sessionTenant;
             }
         }
-
-        // Try to get tenant from route parameter first
-        $routeTenant = $request->route('tenant');
-        Log::debug('get_tenant_domain:' . __LINE__ . ' - Route tenant parameter', ['tenant' => $routeTenant]);
-
-        if ($routeTenant && is_string($routeTenant)) {
-            Log::debug('get_tenant_domain:' . __LINE__ . ' - Found tenant from route parameter', ['tenant' => $routeTenant]);
-            session(['tenant_domain' => $routeTenant]); // Store in session for Livewire requests
-            return $routeTenant;
-        }
-
-        // Only check subdomain if we're using subdomain routing
         if (is_subdomain_request()) {
             $host = $request->getHost();
             $parts = explode('.', $host);
@@ -83,6 +71,18 @@ if (!function_exists('get_tenant_domain')) {
                 return $parts[0];
             }
         }
+        // Try to get tenant from route parameter first
+        $routeTenant = $request->route('tenant');
+        Log::debug('get_tenant_domain:' . __LINE__ . ' - Route tenant parameter', ['tenant' => $routeTenant]);
+
+        if ($routeTenant && is_string($routeTenant)) {
+            Log::debug('get_tenant_domain:' . __LINE__ . ' - Found tenant from route parameter', ['tenant' => $routeTenant]);
+            session(['tenant_domain' => $routeTenant]); // Store in session for Livewire requests
+            return $routeTenant;
+        }
+
+        // Only check subdomain if we're using subdomain routing
+
 
         Log::debug('get_tenant_domain:' . __LINE__ . ' - No tenant domain found');
         return null;
@@ -144,7 +144,7 @@ if (!function_exists('resolve_tenant_from_request')) {
     }
 }
 
-if (! function_exists('tenant_route')) {
+if (!function_exists('tenant_route')) {
     function tenant_route($name, $parameters = [], $absolute = true) {
         Log::debug('tenant_route:' . __LINE__ . ' - Starting tenant route generation', [
             'route' => $name,
@@ -164,45 +164,23 @@ if (! function_exists('tenant_route')) {
             throw new \Exception('No tenant found for route generation');
         }
 
-        $params = array_merge(['tenant' => $tenant->domain], $parameters);
-        Log::debug('tenant_route:' . __LINE__ . ' - Merged route parameters', ['params' => $params]);
+        // If the route name already has a prefix, don't add another one
+        if (!str_starts_with($name, 'subdomain.') && !str_starts_with($name, 'prefix.') && $name != 'home') {
+            if (is_subdomain_request()) {
+                $name = 'subdomain.' . $name;
+            } else {
+                $name = 'prefix.' . $name;
+            }
+            Log::debug('tenant_route:' . __LINE__ . ' - Resolved tenant for route name', ['name' => $name]);
+        }
 
-        // Generate the base route
-        $url = route($name, $params, $absolute);
-        Log::debug('tenant_route:' . __LINE__ . ' - Generated base route', ['url' => $url]);
-
-        // If it's a subdomain request, return the URL as is
+        // For subdomain requests, we don't need the tenant parameter
         if (is_subdomain_request()) {
-            Log::debug('tenant_route:' . __LINE__ . ' - Returning subdomain URL', ['url' => $url]);
-            return $url;
+            return route($name, $parameters, $absolute);
         }
 
-        // For prefix-based routes, convert subdomain URL to prefix format
-        $mainDomain = config('app.url');
-        $baseUrl = str_replace(['http://', 'https://'], '', $mainDomain);
-        $pattern = "https://{$tenant->domain}." . $baseUrl;
-        $httpPattern = "http://{$tenant->domain}." . $baseUrl;
-
-        Log::debug('tenant_route:' . __LINE__ . ' - Converting URL patterns', [
-            'mainDomain' => $mainDomain,
-            'baseUrl' => $baseUrl,
-            'pattern' => $pattern,
-            'httpPattern' => $httpPattern
-        ]);
-
-        if (str_starts_with($url, $pattern)) {
-            $finalUrl = str_replace($pattern, $mainDomain . '/' . $tenant->domain, $url);
-            Log::debug('tenant_route:' . __LINE__ . ' - Converted HTTPS URL', ['from' => $url, 'to' => $finalUrl]);
-            return $finalUrl;
-        }
-
-        if (str_starts_with($url, $httpPattern)) {
-            $finalUrl = str_replace($httpPattern, $mainDomain . '/' . $tenant->domain, $url);
-            Log::debug('tenant_route:' . __LINE__ . ' - Converted HTTP URL', ['from' => $url, 'to' => $finalUrl]);
-            return $finalUrl;
-        }
-
-        Log::debug('tenant_route:' . __LINE__ . ' - Returning original URL', ['url' => $url]);
-        return $url;
+        // For prefix routes, include the tenant in parameters
+        $params = array_merge(['tenant' => $tenant->domain], $parameters);
+        return route($name, $params, $absolute);
     }
 }

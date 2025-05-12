@@ -26,7 +26,7 @@ class MikrotikController extends ApiController
             return response()->json(['message' => 'Invalid API key'], 401);
         }
 
-        $bookings = Booking::where('hotspot_is_created', false)
+        $bookings = Booking::where('hotspot_is_created', 0)
             ->where('tenant_id', $tenant->id)
             ->whereNotNull('hotspot_username')
             ->whereNotNull('hotspot_password')

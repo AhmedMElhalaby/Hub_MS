@@ -40,8 +40,8 @@
                         <x-slot:body>
                             @forelse($recentBookings as $booking)
                                 <flux:table.row>
-                                    <flux:table.cell>{{ $booking->customer->name }}</flux:table.cell>
-                                    <flux:table.cell>{{ $booking->workspace->desk }}</flux:table.cell>
+                                    <flux:table.cell>{{ $booking->customer?->name }}</flux:table.cell>
+                                    <flux:table.cell>{{ $booking->workspace?->desk }}</flux:table.cell>
                                     <flux:table.cell>
                                         <flux:badge variant="solid" :color="$booking->status->color()">
                                             {{ $booking->status->label() }}
