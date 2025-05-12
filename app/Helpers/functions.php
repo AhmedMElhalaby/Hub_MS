@@ -17,6 +17,13 @@ if (!function_exists('enum_rules')){
 if (!function_exists('is_subdomain_request')) {
     function is_subdomain_request(): bool {
         $host = request()->getHost();
+
+        // Check if host matches app URL
+        $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+        if ($host === $appHost) {
+            return false;
+        }
+
         $parts = explode('.', $host);
         return count($parts) >= 3;
     }
