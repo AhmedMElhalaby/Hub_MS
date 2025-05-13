@@ -25,14 +25,17 @@ jobs:
       run: |
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           echo "Deploying branch: $BRANCH_NAME"
-
+    
           if [ "$BRANCH_NAME" = "master" ]; then
             DEPLOY_PATH="${{ secrets.PROD_DEPLOY_PATH }}"
           else
             DEPLOY_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
           fi
-
+    
           cd \$DEPLOY_PATH
+    
+          echo "Current directory: \$PWD"
+    
           git pull origin $BRANCH_NAME
           composer install --no-dev --optimize-autoloader
           php artisan migrate --force
