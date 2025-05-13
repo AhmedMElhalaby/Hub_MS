@@ -1,0 +1,43 @@
+name: Deploy Laravel to EC2
+
+on:
+  push:
+    branches: [ master, development ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to EC2
+      env:
+        BRANCH_NAME: ${{ github.ref_name }}
+      run: |
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          echo "Deploying branch: $BRANCH_NAME"
+
+          if [ "$BRANCH_NAME" = "master" ]; then
+            DEPLOY_PATH="${{ secrets.PROD_DEPLOY_PATH }}"
+          else
+            DEPLOY_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
+          fi
+
+          cd \$DEPLOY_PATH
+          git pull origin $BRANCH_NAME
+          composer install --no-dev --optimize-autoloader
+          php artisan migrate --force
+          npm install
+          npm run build
+          chown -R nginx:nginx storage bootstrap/cache
+          chmod -R 775 storage bootstrap/cache
+        EOF
