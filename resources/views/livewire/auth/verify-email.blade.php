@@ -13,7 +13,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public function sendVerification(): void
     {
         if (Auth::user()->hasVerifiedEmail()) {
-            $this->redirectIntended(default: tenant_route('dashboard', absolute: false), navigate: true);
+            $this->redirectIntended(route('tenant.home'), true);
 
             return;
         }

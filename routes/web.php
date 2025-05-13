@@ -17,25 +17,15 @@ Route::domain(config('app.url'))->group(function () {
         ->name('register.store');
 });
 
-// Shared tenant routes for both subdomain and prefix
-$tenantRoutes = function () {
-    Route::get('/', function() {
-        return redirect()->to(tenant_route('dashboard'));
-    });
-
-    // Guest routes
+Route::domain('{tenant}.'.config('app.url'))->name('tenant.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'create'])
             ->name('login');
         Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'store']);
-
     });
 
-    Route::get('dashboard', App\Http\Controllers\DashboardController::class)
-        ->middleware([Authenticate::class, 'verified'])
-        ->name('dashboard');
-
     Route::middleware([Authenticate::class])->group(function () {
+        Route::get('/', App\Http\Controllers\DashboardController::class)->name('home');
         Route::redirect('settings', 'settings/profile');
         Route::get('/customers', App\Livewire\Customers\CustomersList::class)->name('customers.index');
         Route::get('/customers/{customer}', App\Livewire\Customers\CustomerDetails::class)->name('customers.show');
@@ -61,19 +51,4 @@ $tenantRoutes = function () {
         Route::get('/notifications', App\Livewire\Notifications\NotificationsList::class)->name('notifications.index');
         Route::post('logout', App\Livewire\Actions\Logout::class)->name('logout');
     });
-};
-// Apply same routes for prefix access on main domain
-Route::prefix('{tenant}')
-    ->middleware([\App\Http\Middleware\ResolveTenant::class])
-    ->name('prefix.')
-    ->group($tenantRoutes);
-// Apply routes for subdomain access
-Route::domain('{tenant}.'.config('app.url'))
-    ->middleware([\App\Http\Middleware\ResolveTenant::class])
-    ->name('subdomain.')
-    ->group($tenantRoutes);
-
-
-
-// We don't need this anymore since auth routes are included in tenant routes
-// require __DIR__.'/auth.php';
+});

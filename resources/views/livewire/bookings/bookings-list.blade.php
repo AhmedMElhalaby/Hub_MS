@@ -112,7 +112,7 @@
                         <flux:table.cell>{{ number_format($booking->balance, 2) }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button href="{{ tenant_route('bookings.show', $booking) }}" size="sm">
+                                <flux:button href="{{ route('tenant.bookings.show', $booking) }}" size="sm">
                                     {{ __('View') }}
                                 </flux:button>
                             </div>

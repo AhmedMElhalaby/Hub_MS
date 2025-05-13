@@ -28,7 +28,7 @@ class CustomerDetails extends Component
             $this->customer = $this->customerRepository->findWithBookings($customer->id);
         } catch (\Exception $e) {
             $this->notifyError('messages.customer.not_found');
-            return $this->redirect(tenant_route('customers.index'));
+            return $this->redirect(route('tenant.customers.index'));
         }
     }
 

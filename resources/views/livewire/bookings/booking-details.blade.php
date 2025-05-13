@@ -28,7 +28,7 @@
                     {{ __('Renew') }}
                 </flux:button>
             @endif
-            <flux:button wire:navigate href="{{ tenant_route('bookings.index') }}" variant="outline" size="sm">
+            <flux:button wire:navigate href="{{ route('tenant.bookings.index') }}" variant="outline" size="sm">
                 {{ __('Back to Bookings') }}
             </flux:button>
         </div>

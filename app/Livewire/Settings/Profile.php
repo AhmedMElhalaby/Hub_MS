@@ -51,7 +51,7 @@ class Profile extends Component
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(tenant_route('dashboard', absolute: false));
+            $this->redirectIntended(route('tenant.home'));
             return;
         }
 

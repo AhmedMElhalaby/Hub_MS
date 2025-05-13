@@ -5,7 +5,7 @@
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
-        <form method="POST" action="{{ tenant_route('login') }}" class="flex flex-col gap-6">
+        <form method="POST" action="{{ route('tenant.login') }}" class="flex flex-col gap-6">
             @csrf
             <!-- Email Address -->
             <flux:input
@@ -30,11 +30,11 @@
                     placeholder="Password"
                 />
 
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute right-0 top-0 text-sm" href="{{ tenant_route('password.request') }}">
+                {{-- @if (Route::has('password.request'))
+                    <flux:link class="absolute right-0 top-0 text-sm" href="{{ route('tenant.password.request') }}">
                         {{ __('Forgot your password?') }}
                     </flux:link>
-                @endif
+                @endif --}}
             </div>
 
             <!-- Remember Me -->

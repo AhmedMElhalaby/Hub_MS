@@ -31,7 +31,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         Auth::login($user);
 
-        $this->redirect(tenant_route('dashboard', absolute: false), true);
+        $this->redirect(route('tenant.home'), true);
     }
 }; ?>
 

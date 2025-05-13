@@ -13,6 +13,7 @@ use App\Repositories\WorkspaceRepository;
 use App\Repositories\PlanRepository;
 use App\Repositories\ExpenseRepository;
 use App\Repositories\BookingRepository;
+use Illuminate\Support\Facades\Request;
 
 class AppServiceProvider extends ServiceProvider
 {

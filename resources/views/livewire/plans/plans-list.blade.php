@@ -61,7 +61,7 @@
                         @endif
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ tenant_route('plans.show', $plan) }}" size="sm">
+                                <flux:button wire:navigate href="{{ route('tenant.plans.show', $plan) }}" size="sm">
                                     {{ __('View') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-edit-plan', { planId: {{ $plan->id }} })" size="sm">

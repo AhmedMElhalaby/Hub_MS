@@ -10,9 +10,6 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): View
     {
         $tenant = resolve_tenant_from_request();
@@ -21,15 +18,10 @@ class LoginController extends Controller
         }
         return view('auth.login');
     }
-
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
         Session::regenerate();
-
-        return redirect()->intended(tenant_route('dashboard', [], true));
+        return redirect()->intended(route('tenant.home'));
     }
 }

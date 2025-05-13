@@ -6,7 +6,7 @@
                 <flux:button wire:click="$dispatch('open-edit-expense', { expenseId: {{ $expense->id }} })" variant="primary">
                     {{ __('Edit Expense') }}
                 </flux:button>
-                <flux:button wire:navigate href="{{ tenant_route('expenses.index') }}" variant="outline">
+                <flux:button wire:navigate href="{{ route('tenant.expenses.index') }}" variant="outline">
                     {{ __('Back to Expenses') }}
                 </flux:button>
             </div>

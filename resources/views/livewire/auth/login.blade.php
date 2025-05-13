@@ -39,7 +39,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         // Get tenant from request and redirect using the current access method
         $tenant = resolve_tenant_from_request();
-        $this->redirect(tenant_route('dashboard', [], true));
+        $this->redirect(route('tenant.home'));
     }
 
     /**
@@ -103,11 +103,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 placeholder="Password"
             />
 
-            @if (Route::has('password.request'))
-                <flux:link class="absolute right-0 top-0 text-sm" href="{{ tenant_route('password.request') }}" wire:navigate>
+            {{-- @if (Route::has('password.request'))
+                <flux:link class="absolute right-0 top-0 text-sm" href="{{ route('tenant.password.request') }}" wire:navigate>
                     {{ __('Forgot your password?') }}
                 </flux:link>
-            @endif
+            @endif --}}
         </div>
 
         <!-- Remember Me -->

@@ -6,7 +6,7 @@
                 <flux:button wire:click="$dispatch('open-edit-workspace', { workspaceId: {{ $workspace->id }} })" variant="primary">
                     {{ __('Edit Workspace') }}
                 </flux:button>
-                <flux:button wire:navigate href="{{ tenant_route('workspaces.index') }}" variant="outline">
+                <flux:button wire:navigate href="{{ route('tenant.workspaces.index') }}" variant="outline">
                     {{ __('Back to Workspaces') }}
                 </flux:button>
             </div>

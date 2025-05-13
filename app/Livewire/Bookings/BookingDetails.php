@@ -31,7 +31,7 @@ class BookingDetails extends Component
             $this->selectedBooking = $this->booking;
         } catch (\Exception $e) {
             $this->notifyError('messages.booking.not_found');
-            return $this->redirect(tenant_route('bookings.index'));
+            return $this->redirect(route('tenant.bookings.index'));
         }
     }
     public function render()

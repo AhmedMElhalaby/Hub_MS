@@ -119,13 +119,13 @@
                     <flux:table.row wire:key="{{ $finance->id }}">
                         <flux:table.cell>
                             @if($finance->booking)
-                                <a href="{{ tenant_route('bookings.show', $finance->booking) }}" class="block">
+                                <a href="{{ route('tenant.bookings.show', $finance->booking) }}" class="block">
                                     <flux:badge variant="solid" :color="$finance->type === \App\Enums\FinanceType::Income ? 'success' : 'danger'">
                                         {{ $finance->type->label() }}
                                     </flux:badge>
                                 </a>
                             @elseif($finance->expense)
-                                <a href="{{ tenant_route('expenses.show', $finance->expense) }}" class="block">
+                                <a href="{{ route('tenant.expenses.show', $finance->expense) }}" class="block">
                                     <flux:badge variant="solid" :color="$finance->type === \App\Enums\FinanceType::Income ? 'success' : 'danger'">
                                         {{ $finance->type->label() }}
                                     </flux:badge>
@@ -138,11 +138,11 @@
                         </flux:table.cell>
                         <flux:table.cell>
                             @if($finance->booking)
-                                <a href="{{ tenant_route('bookings.show', $finance->booking) }}" class="text-primary-600 hover:underline">
+                                <a href="{{ route('tenant.bookings.show', $finance->booking) }}" class="text-primary-600 hover:underline">
                                     {{ $finance->booking->customer->name }}
                                 </a>
                             @elseif($finance->expense)
-                                <a href="{{ tenant_route('expenses.show', $finance->expense) }}" class="text-primary-600 hover:underline">
+                                <a href="{{ route('tenant.expenses.show', $finance->expense) }}" class="text-primary-600 hover:underline">
                                     {{ $finance->expense->title }}
                                 </a>
                             @endif

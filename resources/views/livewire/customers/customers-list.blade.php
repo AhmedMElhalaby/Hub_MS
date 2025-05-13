@@ -72,7 +72,7 @@
                         <flux:table.cell>{{ $customer->specialization->name }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ tenant_route('customers.show', $customer) }}"
+                                <flux:button wire:navigate href="{{ route('tenant.customers.show', $customer) }}"
                                     size="sm">
                                     {{ __('View') }}
                                 </flux:button>

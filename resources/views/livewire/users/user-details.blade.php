@@ -7,7 +7,7 @@
                 <flux:button wire:click="$dispatch('open-edit-user', { userId: {{ $user->id }} })" variant="primary">
                     {{ __('Edit User') }}
                 </flux:button>
-                <flux:button wire:navigate href="{{ tenant_route('users.index') }}" variant="outline">
+                <flux:button wire:navigate href="{{ route('tenant.users.index') }}" variant="outline">
                     {{ __('Back to Users') }}
                 </flux:button>
             </div>

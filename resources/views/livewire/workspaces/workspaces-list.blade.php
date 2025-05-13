@@ -59,7 +59,7 @@
                         </flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ tenant_route('workspaces.show', $workspace) }}" size="sm">
+                                <flux:button wire:navigate href="{{ route('tenant.workspaces.show', $workspace) }}" size="sm">
                                     {{ __('View') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-edit-workspace', { workspaceId: {{ $workspace->id }} })" size="sm">

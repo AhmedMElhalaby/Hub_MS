@@ -28,7 +28,7 @@ class UserDetails extends Component
             $this->user = $this->userRepository->findById($user->id);
         } catch (\Exception $e) {
             $this->notifyError('messages.user.not_found');
-            return $this->redirect(tenant_route('users.index'));
+            return $this->redirect(route('tenant.users.index'));
         }
     }
 

@@ -28,7 +28,7 @@ class ExpenseDetails extends Component
             $this->expense = $this->expenseRepository->findWithFinances($expense->id);
         } catch (\Exception $e) {
             $this->notifyError('messages.expense.not_found');
-            return $this->redirect(tenant_route('expenses.index'));
+            return $this->redirect(route('tenant.expenses.index'));
         }
     }
 

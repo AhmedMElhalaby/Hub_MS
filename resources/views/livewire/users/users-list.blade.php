@@ -42,7 +42,7 @@
                         <flux:table.cell>{{ $user->email }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ tenant_route('users.show', $user) }}" size="sm">
+                                <flux:button wire:navigate href="{{ route('tenant.users.show', $user) }}" size="sm">
                                     {{ __('View') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-edit-user', { userId: {{ $user->id }} })" size="sm">

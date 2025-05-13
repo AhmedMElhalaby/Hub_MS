@@ -28,7 +28,7 @@ class PlanDetails extends Component
             $this->plan = $this->planRepository->findWithBookings($plan->id);
         } catch (\Exception $e) {
             $this->notifyError('messages.plan.not_found');
-            return $this->redirect(tenant_route('plans.index'));
+            return $this->redirect(route('tenant.plans.index'));
         }
     }
 

@@ -65,7 +65,7 @@
                         <flux:table.cell>{{ $expense->created_at->format('M d, Y H:i') }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex space-x-2">
-                                <flux:button wire:navigate href="{{ tenant_route('expenses.show', $expense) }}" size="sm">
+                                <flux:button wire:navigate href="{{ route('tenant.expenses.show', $expense) }}" size="sm">
                                     {{ __('View') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-edit-expense', { expenseId: {{ $expense->id }} })" size="sm">
