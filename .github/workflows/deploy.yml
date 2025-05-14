@@ -23,17 +23,20 @@ jobs:
       env:
         BRANCH_NAME: ${{ github.ref_name }}
       run: |
+        # set DEPLOY_PATH based on the branch before entering SSH
+        # if [ "${BRANCH_NAME}" = "master" ]; then
+        #   DEPLOY_PATH="/var/www/workan"
+        # else
+        #   DEPLOY_PATH="/var/www/workan-dev"
+        # fi
+    
+        # echo "Deploying branch: $BRANCH_NAME to path: $DEPLOY_PATH"
+    
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
-          echo "Deploying branch: $BRANCH_NAME"
-
-          if [ "$BRANCH_NAME" = "master" ]; then
-            DEPLOY_PATH="${{ secrets.PROD_DEPLOY_PATH }}"
-          else
-            DEPLOY_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
-          fi
-
-          cd \$DEPLOY_PATH
-          git pull origin $BRANCH_NAME
+          cd /var/www/workan || exit 1
+          echo "In directory: \$(pwd)"
+    
+          git pull origin $BRANCH_NAME || exit 1
           composer install --no-dev --optimize-autoloader
           php artisan migrate --force
           npm install
