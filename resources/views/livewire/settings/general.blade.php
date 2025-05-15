@@ -1,5 +1,5 @@
 <section class="w-full">
-    <x-settings.layout heading="{{ __('crud.settings.model.plural') }}" subheading="{{ __('crud.settings.messages.updated') }}">
+    <x-settings.layout heading="{{ __('crud.settings.model.plural') }}" subheading="{{ __('crud.settings.actions.update') }}">
         <div class="mt-6">
             <flux:heading size="lg">{{ __('crud.settings.labels.basic_information') }}</flux:heading>
             <form wire:submit.prevent="save" class="mt-4 space-y-6 max-w-xl">

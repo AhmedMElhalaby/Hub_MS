@@ -89,7 +89,7 @@
                 @empty
                     <flux:table.row>
                         <flux:table.cell colspan="5" class="text-center">
-                            {{ __('crud.common.messages.no_records', ['model' => __('customers')]) }}
+                            {{ __('crud.common.messages.no_records', ['model' => __('crud.customers.model.plural')]) }}
                         </flux:table.cell>
                     </flux:table.row>
                 @endforelse
