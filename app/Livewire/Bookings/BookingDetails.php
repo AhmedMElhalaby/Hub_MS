@@ -30,7 +30,7 @@ class BookingDetails extends Component
             $this->booking = $this->bookingRepository->findWithRelations($booking->id);
             $this->selectedBooking = $this->booking;
         } catch (\Exception $e) {
-            $this->notifyError('messages.booking.not_found');
+            $this->notifyError(__('crud.common.messages.not_found', ['model' => __('crud.bookings.model.singular')]));
             return $this->redirect(route('tenant.bookings.index'));
         }
     }

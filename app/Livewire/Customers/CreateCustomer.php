@@ -42,9 +42,9 @@ class CreateCustomer extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('customer-created');
-            $this->notifySuccess('messages.customer.created');
+            $this->notifySuccess(__('crud.customers.messages.created'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.customer.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.customers.model.singular')]));
         }
     }
 

@@ -60,9 +60,9 @@ class BookingsList extends Component
             )->paginate(10),
             'statuses' => BookingStatus::cases(),
             'dateTypes' => [
-                'created' => __('Created Date'),
-                'start' => __('Start Date'),
-                'end' => __('End Date'),
+                'created' => __('crud.common.fields.created_at'),
+                'start' => __('crud.bookings.fields.started_at'),
+                'end' => __('crud.bookings.fields.ended_at'),
             ],
             'plans' => Plan::all(),
         ]);

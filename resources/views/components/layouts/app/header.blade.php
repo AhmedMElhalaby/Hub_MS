@@ -6,7 +6,7 @@
     $secondaryColor = Setting::get('secondary_color', '#666666');
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ in_array(app()->getLocale(), ['ar', 'he', 'fa', 'ur']) ? 'rtl' : 'ltr' }}" class="dark">
     <head>
         @include('partials.head')
         <title>{{ $appName }}</title>
@@ -100,12 +100,24 @@
 
                     <flux:menu.separator />
 
-                    <form method="POST" action="{{ route('tenant.logout') }}" class="w-full">
-                        @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                            {{ __('Log Out') }}
-                        </flux:menu.item>
-                    </form>
+                    <flux:dropdown position="bottom" align="end">
+                        <flux:button>
+                            {{ strtoupper(app()->getLocale()) }}
+                        </flux:button>
+
+                        <flux:menu>
+                            <flux:menu.radio.group>
+                                @foreach(['en', 'ar'] as $locale)
+                                    <flux:menu.item
+                                        href="{{ route(Route::currentRouteName(), ['locale' => $locale]) }}"
+                                        :active="app()->getLocale() === $locale"
+                                    >
+                                        {{ $locale === 'en' ? 'English' : 'العربية' }}
+                                    </flux:menu.item>
+                                @endforeach
+                            </flux:menu.radio.group>
+                        </flux:menu>
+                    </flux:dropdown>
                 </flux:menu>
             </flux:dropdown>
         </flux:header>

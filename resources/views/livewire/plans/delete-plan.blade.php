@@ -1,14 +1,14 @@
 <div>
     <flux:modal wire:model="showModal">
         <div class="space-y-6">
-            <flux:heading size="lg">{{ __('Delete Plan') }}</flux:heading>
-            <p>{{ __('Are you sure you want to delete this plan?') }}</p>
+            <flux:heading size="lg">{{ __('crud.plans.actions.delete') }}</flux:heading>
+            <p>{{ __('crud.plans.messages.delete_confirm') }}</p>
             <div class="flex justify-end space-x-2">
                 <flux:button wire:click="$set('showModal', false)" variant="outline">
-                    {{ __('Cancel') }}
+                    {{ __('crud.common.actions.cancel') }}
                 </flux:button>
                 <flux:button wire:click="delete" variant="danger">
-                    {{ __('Delete') }}
+                    {{ __('crud.common.actions.delete') }}
                 </flux:button>
             </div>
         </div>

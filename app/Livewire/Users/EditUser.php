@@ -46,9 +46,9 @@ class EditUser extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('user-updated');
-            $this->notifySuccess('messages.user.updated');
+            $this->notifySuccess(__('crud.users.messages.updated'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.user.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.users.model.singular')]));
         }
     }
 

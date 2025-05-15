@@ -3,16 +3,16 @@
 @endphp
 <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <flux:heading>{{ __('Plans Management') }}</flux:heading>
+        <flux:heading>{{ __('crud.plans.labels.management') }}</flux:heading>
         <flux:button wire:click="$dispatch('open-create-plan')" variant="primary">
-            {{ __('Add New Plan') }}
+            {{ __('crud.plans.actions.create') }}
         </flux:button>
     </div>
 
     <div class="flex gap-4 mb-4">
         <div class="flex-1">
-            <flux:input wire:model.live="search" type="search" label="{{ __('Search') }}"
-                placeholder="Search plans..." />
+            <flux:input wire:model.live="search" type="search" label="{{ __('crud.common.actions.search') }}"
+                placeholder="{{ __('crud.plans.labels.search') }}" />
         </div>
     </div>
 
@@ -21,7 +21,7 @@
             <x-slot:header>
                 <flux:table.head>
                     <button wire:click="sortBy('type')" class="flex items-center space-x-1">
-                        <span>{{ __('Type') }}</span>
+                        <span>{{ __('crud.plans.fields.type') }}</span>
                         @if ($sortField === 'type')
                             <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}"
                                 class="size-4" />
@@ -30,7 +30,7 @@
                 </flux:table.head>
                 <flux:table.head>
                     <button wire:click="sortBy('price')" class="flex items-center space-x-1">
-                        <span>{{ __('Price') }}</span>
+                        <span>{{ __('crud.plans.fields.price') }}</span>
                         @if ($sortField === 'price')
                             <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}"
                                 class="size-4" />
@@ -40,7 +40,7 @@
                 @if(Setting::get('mikrotik_enabled'))
                 <flux:table.head>
                     <button wire:click="sortBy('mikrotik_profile')" class="flex items-center space-x-1">
-                        <span>{{ __('Mikrotik Profile') }}</span>
+                        <span>{{ __('crud.plans.fields.mikrotik_profile') }}</span>
                         @if ($sortField === 'mikrotik_profile')
                             <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}"
                                 class="size-4" />
@@ -48,7 +48,7 @@
                     </button>
                 </flux:table.head>
                 @endif
-                <flux:table.head>{{ __('Actions') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.common.fields.actions') }}</flux:table.head>
             </x-slot:header>
 
             <x-slot:body>
@@ -62,14 +62,14 @@
                         <flux:table.cell>
                             <div class="flex space-x-2">
                                 <flux:button wire:navigate href="{{ route('tenant.plans.show', $plan) }}" size="sm">
-                                    {{ __('View') }}
+                                    {{ __('crud.common.actions.view') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-edit-plan', { planId: {{ $plan->id }} })" size="sm">
-                                    {{ __('Edit') }}
+                                    {{ __('crud.common.actions.edit') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-delete-plan', { planId: {{ $plan->id }} })" variant="danger"
                                     size="sm">
-                                    {{ __('Delete') }}
+                                    {{ __('crud.common.actions.delete') }}
                                 </flux:button>
                             </div>
                         </flux:table.cell>
@@ -77,7 +77,7 @@
                 @empty
                     <flux:table.row>
                         <flux:table.cell colspan="{{ Setting::get('mikrotik_enabled') ? 4 : 3 }}" class="text-center">
-                            {{ __('No plans found.') }}
+                            {{ __('crud.plans.labels.no_plans') }}
                         </flux:table.cell>
                     </flux:table.row>
                 @endforelse
@@ -92,18 +92,4 @@
     <livewire:plans.create-plan />
     <livewire:plans.edit-plan />
     <livewire:plans.delete-plan />
-
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('plan-created', () => {
-                Livewire.dispatch('refresh');
-            });
-            Livewire.on('plan-updated', () => {
-                Livewire.dispatch('refresh');
-            });
-            Livewire.on('plan-deleted', () => {
-                Livewire.dispatch('refresh');
-            });
-        });
-    </script>
 </div>

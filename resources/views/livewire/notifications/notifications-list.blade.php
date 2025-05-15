@@ -1,9 +1,9 @@
 <div class="p-6">
     <div class="mb-6">
         <div class="flex items-center justify-between">
-            <flux:heading>{{ __('Notifications') }}</flux:heading>
+            <flux:heading>{{ __('crud.notifications.model.plural') }}</flux:heading>
             <flux:button wire:click="markAllAsRead" variant="outline">
-                {{ __('Mark All as Read') }}
+                {{ __('crud.notifications.actions.mark_all_as_read') }}
             </flux:button>
         </div>
     </div>
@@ -26,7 +26,7 @@
                             <div class="ml-4">
                                 @if(is_null($notification->read_at))
                                     <flux:button wire:click.stop="markAsRead('{{ $notification->id }}')" size="sm">
-                                        {{ __('Mark as Read') }}
+                                        {{ __('crud.notifications.actions.mark_as_read') }}
                                     </flux:button>
                                 @endif
                             </div>
@@ -37,8 +37,8 @@
         @empty
             <div class="text-center py-12">
                 <flux:icon name="bell" class="mx-auto size-12 text-zinc-400" />
-                <h3 class="mt-2 text-sm font-medium">{{ __('No notifications') }}</h3>
-                <p class="mt-1 text-sm text-zinc-500">{{ __('You\'re all caught up!') }}</p>
+                <h3 class="mt-2 text-sm font-medium">{{ __('crud.notifications.messages.no_notifications') }}</h3>
+                <p class="mt-1 text-sm text-zinc-500">{{ __('crud.notifications.messages.all_caught_up') }}</p>
             </div>
         @endforelse
 

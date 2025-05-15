@@ -36,9 +36,9 @@ class CreateWorkspace extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('workspace-created');
-            $this->notifySuccess('messages.workspace.created');
+            $this->notifySuccess(__('crud.workspaces.messages.created'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.workspace.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.workspaces.model.singular')]));
         }
     }
 

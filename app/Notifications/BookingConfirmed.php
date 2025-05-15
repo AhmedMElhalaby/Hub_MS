@@ -28,8 +28,10 @@ class BookingConfirmed extends Notification
 
     public function toSms($notifiable)
     {
-        $message = "Your booking #{$this->booking->id} has been confirmed. ";
-        $message .= "Start: {$this->booking->started_at->format('M d, Y H:i')}";
+        $message = __('crud.bookings.messages.confirmed_sms', [
+            'id' => $this->booking->id,
+            'start' => $this->booking->started_at->format('M d, Y H:i')
+        ]);
 
         return [
             'to' => $notifiable->phone,

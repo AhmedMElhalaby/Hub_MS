@@ -15,13 +15,13 @@ enum ExpenseCategory: int
     public function label(): string
     {
         return match($this) {
-            self::Electricity => __('Electricity'),
-            self::Water => __('Water'),
-            self::Rent => __('Rent'),
-            self::Internet => __('Internet'),
-            self::Supplies => __('Supplies'),
-            self::Salaries => __('Salaries'),
-            self::Others => __('Others'),
+            self::Electricity => __('crud.expenses.categories.electricity'),
+            self::Water => __('crud.expenses.categories.water'),
+            self::Rent => __('crud.expenses.categories.rent'),
+            self::Internet => __('crud.expenses.categories.internet'),
+            self::Supplies => __('crud.expenses.categories.supplies'),
+            self::Salaries => __('crud.expenses.categories.salaries'),
+            self::Others => __('crud.expenses.categories.others'),
         };
     }
 }

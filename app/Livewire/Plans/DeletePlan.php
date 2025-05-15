@@ -27,9 +27,9 @@ class DeletePlan extends Component
             $this->planRepository->delete($this->planId);
             $this->closeModal();
             $this->dispatch('plan-deleted');
-            $this->notifySuccess('messages.plan.deleted');
+            $this->notifySuccess(__('crud.plans.messages.deleted'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.plan.delete_error');
+            $this->notifyError(__('crud.common.messages.delete_error', ['model' => __('crud.plans.model.singular')]));
         }
     }
 

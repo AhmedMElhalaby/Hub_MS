@@ -119,9 +119,9 @@ class EditBooking extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('booking-updated');
-            $this->notifySuccess('messages.booking.updated');
+            $this->notifySuccess(__('crud.bookings.messages.updated'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.booking.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.bookings.model.singular')]));
         }
     }
 

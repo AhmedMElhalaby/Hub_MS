@@ -24,11 +24,11 @@ class DeleteUser extends Component
     {
         try {
             $this->userRepository->delete($this->userId);
-            $this->notifySuccess('messages.user.deleted');
+            $this->notifySuccess(__('crud.users.messages.deleted'));
             $this->dispatch('user-deleted');
             $this->closeModal();
         } catch (\Exception $e) {
-            $this->notifyError('messages.user.delete_error');
+            $this->notifyError(__('crud.common.messages.delete_error', ['model' => __('crud.users.model.singular')]));
         }
     }
 

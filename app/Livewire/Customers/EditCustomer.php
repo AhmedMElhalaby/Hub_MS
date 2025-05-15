@@ -41,9 +41,9 @@ class EditCustomer extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('customer-updated');
-            $this->notifySuccess('messages.customer.updated');
+            $this->notifySuccess(__('crud.customers.messages.updated'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.customer.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.customers.model.singular')]));
         }
     }
 

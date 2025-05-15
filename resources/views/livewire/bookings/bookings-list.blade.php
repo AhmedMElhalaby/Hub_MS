@@ -1,8 +1,8 @@
 <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <flux:heading>{{ __('Bookings Management') }}</flux:heading>
+        <flux:heading>{{ __('crud.bookings.labels.management') }}</flux:heading>
         <flux:button wire:click="$dispatch('open-create-booking')" variant="primary">
-            {{ __('Add New Booking') }}
+            {{ __('crud.bookings.actions.create') }}
         </flux:button>
     </div>
 
@@ -10,13 +10,13 @@
         <!-- Search Box and Advanced Filters Button -->
         <div class="flex gap-4 items-end">
             <div class="flex-1">
-                <flux:input wire:model.live="search" type="search" label="{{ __('Search') }}"
-                    placeholder="Search bookings..." />
+                <flux:input wire:model.live="search" type="search" label="{{ __('crud.common.actions.search') }}"
+                    placeholder="{{ __('crud.bookings.labels.search') }}" />
             </div>
             <div>
                 <flux:button wire:click="triggerFilter" variant="outline" class="flex items-center gap-2">
                     <span class="inline-flex items-center">
-                        {{ __('Advanced Filters') }}
+                        {{ __('crud.bookings.labels.advanced_filters') }}
                         <flux:icon name="chevron-{{ $showFilter ? 'up' : 'down' }}" class="size-4 ml-2" />
                     </span>
                 </flux:button>
@@ -36,15 +36,15 @@
             <div class="p-4 space-y-4 bg-zinc-50 p-4 dark:bg-zinc-900 rounded-lg">
                 <!-- Status and Plan Filters -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <flux:select wire:model.live="statusFilter" label="{{ __('Filter by Status') }}">
-                        <option value="">{{ __('All Statuses') }}</option>
+                    <flux:select wire:model.live="statusFilter" label="{{ __('crud.bookings.labels.filter_by_status') }}">
+                        <option value="">{{ __('crud.bookings.labels.all_statuses') }}</option>
                         @foreach($statuses as $status)
                             <option value="{{ $status->value }}">{{ $status->label() }}</option>
                         @endforeach
                     </flux:select>
 
-                    <flux:select wire:model.live="planFilter" label="{{ __('Filter by Plan') }}">
-                        <option value="">{{ __('All Plans') }}</option>
+                    <flux:select wire:model.live="planFilter" label="{{ __('crud.bookings.labels.filter_by_plan') }}">
+                        <option value="">{{ __('crud.bookings.labels.all_plans') }}</option>
                         @foreach($plans as $plan)
                             <option value="{{ $plan->id }}">{{ $plan->type->label() }}</option>
                         @endforeach
@@ -53,7 +53,7 @@
 
                 <!-- Date Filters -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <flux:select wire:model.live="dateType" label="{{ __('Date Type') }}">
+                    <flux:select wire:model.live="dateType" label="{{ __('crud.bookings.labels.date_type') }}">
                         @foreach($dateTypes as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
@@ -62,20 +62,20 @@
                     <flux:input
                         wire:model.live="dateFrom"
                         type="date"
-                        label="{{ __('From Date') }}"
+                        label="{{ __('crud.bookings.fields.started_at') }}"
                     />
 
                     <flux:input
                         wire:model.live="dateTo"
                         type="date"
-                        label="{{ __('To Date') }}"
+                        label="{{ __('crud.bookings.fields.ended_at') }}"
                     />
                 </div>
 
                 <!-- Reset Button -->
                 <div class="flex justify-end">
                     <flux:button wire:click="resetFilters" variant="outline" size="sm">
-                        {{ __('Reset Filters') }}
+                        {{ __('crud.common.actions.reset') }}
                     </flux:button>
                 </div>
             </div>
@@ -86,14 +86,14 @@
     <div class="mt-6 overflow-x-auto">
         <flux:table>
             <x-slot:header>
-                <flux:table.head>{{ __('Customer') }}</flux:table.head>
-                <flux:table.head>{{ __('Workspace') }}</flux:table.head>
-                <flux:table.head>{{ __('Plan') }}</flux:table.head>
-                <flux:table.head>{{ __('Date') }}</flux:table.head>
-                <flux:table.head>{{ __('Status') }}</flux:table.head>
-                <flux:table.head>{{ __('Total') }}</flux:table.head>
-                <flux:table.head>{{ __('Balance') }}</flux:table.head>
-                <flux:table.head>{{ __('Actions') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.bookings.fields.customer') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.bookings.fields.workspace') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.bookings.fields.plan') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.bookings.fields.started_at') }} - {{ __('crud.bookings.fields.ended_at') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.bookings.fields.status') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.bookings.fields.total') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.bookings.fields.balance') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.common.fields.actions') }}</flux:table.head>
             </x-slot:header>
 
             <x-slot:body>
@@ -113,7 +113,7 @@
                         <flux:table.cell>
                             <div class="flex space-x-2">
                                 <flux:button href="{{ route('tenant.bookings.show', $booking) }}" size="sm">
-                                    {{ __('View') }}
+                                    {{ __('crud.common.actions.view') }}
                                 </flux:button>
                             </div>
                         </flux:table.cell>
@@ -121,7 +121,7 @@
                 @empty
                     <flux:table.row>
                         <flux:table.cell colspan="9" class="text-center">
-                            {{ __('No bookings found.') }}
+                            {{ __('crud.common.messages.no_records', ['model' => __('crud.bookings.model.singular')]) }}
                         </flux:table.cell>
                     </flux:table.row>
                 @endforelse

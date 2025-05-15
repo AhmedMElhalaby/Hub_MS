@@ -5,16 +5,16 @@
     <flux:modal wire:model="showModal" variant="flyout">
         <form wire:submit.prevent="store" class="space-y-6">
             <flux:heading size="lg">
-                {{ __('Create Plan') }}
+                {{ __('crud.plans.actions.create') }}
             </flux:heading>
 
             <flux:select
                 wire:model.live="type"
-                label="{{ __('Type') }}"
+                label="{{ __('crud.plans.fields.type') }}"
                 required
                 :error="$errors->first('type')"
             >
-                <option value="">{{ __('Select Type') }}</option>
+                <option value="">{{ __('crud.plans.labels.select_type') }}</option>
                 @foreach($types as $type)
                     <option value="{{ $type->value }}">{{ $type->label() }}</option>
                 @endforeach
@@ -22,7 +22,7 @@
 
             <flux:input
                 wire:model.live="price"
-                label="{{ __('Price') }}"
+                label="{{ __('crud.plans.fields.price') }}"
                 type="number"
                 step="0.01"
                 required
@@ -32,11 +32,11 @@
             @if(Setting::get('mikrotik_enabled'))
             <flux:select
                 wire:model.live="mikrotik_profile"
-                label="{{ __('Mikrotik Profile') }}"
+                label="{{ __('crud.plans.fields.mikrotik_profile') }}"
                 required
                 :error="$errors->first('mikrotik_profile')"
             >
-                <option value="">{{ __('Select Profile') }}</option>
+                <option value="">{{ __('crud.plans.labels.select_profile') }}</option>
                 @foreach($availableProfiles as $profile)
                     <option value="{{ $profile }}">{{ $profile }}</option>
                 @endforeach
@@ -45,11 +45,11 @@
 
             <div class="flex justify-end space-x-2 mt-10">
                 <flux:button type="button" wire:click="$set('showModal', false)" variant="outline">
-                    {{ __('Cancel') }}
+                    {{ __('crud.common.actions.cancel') }}
                 </flux:button>
                 <flux:button wire:loading.attr="disabled" wire:target="store" type="submit" variant="primary">
-                    <span wire:loading.remove wire:target="store">{{ __('Save') }}</span>
-                    <span wire:loading wire:target="store">{{ __('Saving...') }}</span>
+                    <span wire:loading.remove wire:target="store">{{ __('crud.common.actions.save') }}</span>
+                    <span wire:loading wire:target="store">{{ __('crud.common.actions.saving') }}</span>
                 </flux:button>
             </div>
         </form>

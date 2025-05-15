@@ -2,38 +2,38 @@
     <flux:modal wire:model="showModal" variant="flyout">
         <form wire:submit.prevent="store" class="space-y-6">
             <flux:heading size="lg">
-                {{ __('Create User') }}
+                {{ __('crud.users.actions.create') }}
             </flux:heading>
 
             <flux:input
                 wire:model.live="name"
-                label="{{ __('Name') }}"
+                label="{{ __('crud.users.fields.name') }}"
                 required
                 :error="$errors->first('name')"
             />
             <flux:input
                 wire:model.live="email"
                 type="email"
-                label="{{ __('Email') }}"
+                label="{{ __('crud.users.fields.email') }}"
                 required
                 :error="$errors->first('email')"
             />
             <flux:input
                 wire:model.live="password"
                 type="password"
-                label="{{ __('Password') }}"
+                label="{{ __('crud.users.fields.password') }}"
                 required
                 :error="$errors->first('password')"
             />
 
             <div class="flex justify-end space-x-2 mt-10">
                 <flux:button type="button" wire:click="closeModal" variant="outline">
-                    {{ __('Cancel') }}
+                    {{ __('crud.common.actions.cancel') }}
                 </flux:button>
                 <flux:button wire:loading.attr="disabled" wire:target="store" type="submit"
                     variant="primary">
-                    <span wire:loading.remove wire:target="store">{{ __('Save') }}</span>
-                    <span wire:loading wire:target="store">{{ __('Saving...') }}</span>
+                    <span wire:loading.remove wire:target="store">{{ __('crud.common.actions.save') }}</span>
+                    <span wire:loading wire:target="store">{{ __('crud.common.actions.saving') }}</span>
                 </flux:button>
             </div>
         </form>

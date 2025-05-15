@@ -50,9 +50,9 @@ class CreatePlan extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('plan-created');
-            $this->notifySuccess('messages.plan.created');
+            $this->notifySuccess(__('crud.plans.messages.created'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.plan.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.plans.model.singular')]));
         }
     }
 

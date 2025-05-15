@@ -37,9 +37,9 @@ class EditExpense extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('expense-updated');
-            $this->notifySuccess('messages.expense.updated');
+            $this->notifySuccess(__('crud.expenses.messages.updated'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.expense.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.expenses.model.singular')]));
         }
     }
 

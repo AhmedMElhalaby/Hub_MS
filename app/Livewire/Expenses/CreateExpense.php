@@ -36,9 +36,9 @@ class CreateExpense extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('expense-created');
-            $this->notifySuccess('messages.expense.created');
+            $this->notifySuccess(__('crud.expenses.messages.created'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.expense.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.expenses.model.singular')]));
         }
     }
 

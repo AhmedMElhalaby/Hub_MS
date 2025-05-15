@@ -27,9 +27,9 @@ class ConfirmBooking extends Component
             $this->bookingRepository->confirm($this->bookingId);
             $this->closeModal();
             $this->dispatch('booking-confirmed');
-            $this->notifySuccess('messages.booking.confirmed');
+            $this->notifySuccess(__('crud.bookings.messages.confirmed'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.booking.confirmed_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.bookings.model.singular')]));
         }
     }
 

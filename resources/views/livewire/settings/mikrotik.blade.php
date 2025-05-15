@@ -9,7 +9,7 @@
     );
 @endphp
 <section class="w-full" x-data="{ showScript: false }">
-    <x-settings.layout heading="{{ __('Mikrotik Settings') }}" subheading="{{ __('Configure Mikrotik integration settings') }}">
+    <x-settings.layout heading="{{ __('crud.settings.labels.mikrotik') }}" subheading="{{ __('crud.settings.labels.update_your_mikrotik_settings') }}">
         <div class="mt-6">
             <form wire:submit.prevent="save" class="mt-4 space-y-6 max-w-xl">
                 <div>
@@ -22,7 +22,7 @@
                             >
                             <div class="w-11 h-6 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600 dark:bg-zinc-700 dark:peer-checked:bg-primary-500"></div>
                         </div>
-                        <span class="ms-3 text-sm font-medium text-zinc-700 dark:text-zinc-200">{{ __('Enable Mikrotik Integration') }}</span>
+                        <span class="ms-3 text-sm font-medium text-zinc-700 dark:text-zinc-200">{{ __('crud.settings.actions.update') }}</span>
                     </label>
                 </div>
 
@@ -33,10 +33,10 @@
                             variant="outline"
                             wire:click="$set('showScript', true)"
                         >
-                            {{ __('View Integration Script') }}
+                            {{ __('crud.common.actions.view') }}
                         </flux:button>
                         <flux:button variant="primary" type="submit">
-                            {{ __('Save Mikrotik Settings') }}
+                            {{ __('crud.common.actions.save') }}
                         </flux:button>
                     </div>
                 </div>
@@ -45,9 +45,9 @@
             <!-- Modal -->
             <flux:modal wire:model="showScript">
                 <div class="space-y-6">
-                    <flux:heading size="lg">{{ __('Mikrotik Integration Script') }}</flux:heading>
+                    <flux:heading size="lg">{{ __('crud.settings.labels.management') }}</flux:heading>
                     <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                        {{ __('Add this script to your Mikrotik device to enable integration with the system.') }}
+                        {{ __('crud.settings.messages.updated') }}
                     </p>
                     <div class="relative">
                         <pre class="bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-sm font-mono">{{ $scriptContent }}</pre>

@@ -51,9 +51,9 @@ class EditPlan extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('plan-updated');
-            $this->notifySuccess('messages.plan.updated');
+            $this->notifySuccess(__('crud.plans.messages.updated'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.plan.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.plans.model.singular')]));
         }
     }
 

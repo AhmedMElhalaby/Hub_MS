@@ -12,10 +12,10 @@ enum BookingStatus: int
     public function label(): string
     {
         return match($this) {
-            self::Draft => __('Draft'),
-            self::Confirmed => __('Confirmed'),
-            self::Cancelled => __('Cancelled'),
-            self::Completed => __('Completed'),
+            self::Draft => __('crud.bookings.status.draft'),
+            self::Confirmed => __('crud.bookings.status.confirmed'),
+            self::Cancelled => __('crud.bookings.status.canceled'),
+            self::Completed => __('crud.bookings.status.completed'),
         };
     }
 
@@ -48,6 +48,7 @@ enum BookingStatus: int
     {
         return $this === self::Completed;
     }
+
     public function canPay(): bool
     {
         return !in_array($this, [self::Draft, self::Cancelled]);

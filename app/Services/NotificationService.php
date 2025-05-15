@@ -8,7 +8,7 @@ trait NotificationService
     {
         $this->dispatch('notify', [
             'type' => $type,
-            'message' => __($message)
+            'message' => $message
         ]);
     }
 

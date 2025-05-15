@@ -41,10 +41,10 @@ class PayBooking extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('booking-payed');
-            $this->notifySuccess('messages.booking.payment_processed');
+            $this->notifySuccess(__('crud.bookings.messages.paid'));
         } catch (\Exception $e) {
             $this->notifyError($e->getMessage());
-            $this->notifyError('messages.booking.payment_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.bookings.model.singular')]));
         }
     }
 

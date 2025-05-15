@@ -37,9 +37,9 @@ class CreateUser extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('user-created');
-            $this->notifySuccess('messages.user.created');
+            $this->notifySuccess(__('crud.users.messages.created'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.user.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.users.model.singular')]));
         }
     }
 

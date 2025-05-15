@@ -25,11 +25,11 @@ class DeleteWorkspace extends Component
     {
         try {
             $this->workspaceRepository->delete($this->workspaceId);
-            $this->notifySuccess('messages.workspace.deleted');
+            $this->notifySuccess(__('crud.workspaces.messages.deleted'));
             $this->dispatch('workspace-deleted');
             $this->closeModal();
         } catch (\Exception $e) {
-            $this->notifyError('messages.workspace.delete_error');
+            $this->notifyError(__('crud.common.messages.delete_error', ['model' => __('crud.workspaces.model.singular')]));
         }
     }
 

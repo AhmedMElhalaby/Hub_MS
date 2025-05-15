@@ -1,21 +1,21 @@
 <div class="p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
-        <flux:heading>{{ __('Workspaces Management') }}</flux:heading>
+        <flux:heading>{{ __('crud.workspaces.labels.management') }}</flux:heading>
         <flux:button wire:click="$dispatch('open-create-workspace')" variant="primary">
-            {{ __('Add New Workspace') }}
+            {{ __('crud.workspaces.actions.create') }}
         </flux:button>
     </div>
 
     <!-- Search and Filter -->
     <div class="flex gap-4 mb-4">
         <div class="flex-1">
-            <flux:input wire:model.live="search" type="search" label="{{ __('Search') }}"
-                placeholder="Search workspaces..." />
+            <flux:input wire:model.live="search" type="search" label="{{ __('crud.common.actions.search') }}"
+                placeholder="{{ __('crud.workspaces.labels.search') }}" />
         </div>
         <div class="w-64">
-            <flux:select wire:model.live="statusFilter" label="{{ __('Filter by Status') }}">
-                <option value="">{{ __('All Statuses') }}</option>
+            <flux:select wire:model.live="statusFilter" label="{{ __('crud.workspaces.labels.filter_by_status') }}">
+                <option value="">{{ __('crud.workspaces.labels.all_statuses') }}</option>
                 @foreach($statuses as $status)
                     <option value="{{ $status->value }}">{{ $status->label() }}</option>
                 @endforeach
@@ -29,7 +29,7 @@
             <x-slot:header>
                 <flux:table.head>
                     <button wire:click="sortBy('desk')" class="flex items-center space-x-1">
-                        <span>{{ __('Desk') }}</span>
+                        <span>{{ __('crud.workspaces.fields.desk') }}</span>
                         @if ($sortField === 'desk')
                             <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}"
                                 class="size-4" />
@@ -38,20 +38,20 @@
                 </flux:table.head>
                 <flux:table.head>
                     <button wire:click="sortBy('status')" class="flex items-center space-x-1">
-                        <span>{{ __('Status') }}</span>
+                        <span>{{ __('crud.workspaces.fields.status') }}</span>
                         @if ($sortField === 'status')
                             <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}"
                                 class="size-4" />
                         @endif
                     </button>
                 </flux:table.head>
-                <flux:table.head>{{ __('Actions') }}</flux:table.head>
+                <flux:table.head>{{ __('crud.common.fields.actions') }}</flux:table.head>
             </x-slot:header>
 
             <x-slot:body>
                 @forelse($workspaces as $workspace)
                     <flux:table.row wire:key="{{ $workspace->id }}">
-                        <flux:table.cell>Desk - {{ $workspace->desk }}</flux:table.cell>
+                        <flux:table.cell>{{ __('crud.workspaces.fields.desk') }} - {{ $workspace->desk }}</flux:table.cell>
                         <flux:table.cell>
                             <flux:badge variant="solid" :color="$workspace->status->color()">
                                 {{ $workspace->status->label() }}
@@ -60,13 +60,13 @@
                         <flux:table.cell>
                             <div class="flex space-x-2">
                                 <flux:button wire:navigate href="{{ route('tenant.workspaces.show', $workspace) }}" size="sm">
-                                    {{ __('View') }}
+                                    {{ __('crud.workspaces.actions.view') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-edit-workspace', { workspaceId: {{ $workspace->id }} })" size="sm">
-                                    {{ __('Edit') }}
+                                    {{ __('crud.workspaces.actions.edit') }}
                                 </flux:button>
                                 <flux:button wire:click="$dispatch('open-delete-workspace', { workspaceId: {{ $workspace->id }} })" variant="danger" size="sm">
-                                    {{ __('Delete') }}
+                                    {{ __('crud.workspaces.actions.delete') }}
                                 </flux:button>
                             </div>
                         </flux:table.cell>
@@ -74,7 +74,7 @@
                 @empty
                     <flux:table.row>
                         <flux:table.cell colspan="3" class="text-center">
-                            {{ __('No workspaces found.') }}
+                            {{ __('crud.workspaces.labels.no_workspaces') }}
                         </flux:table.cell>
                     </flux:table.row>
                 @endforelse

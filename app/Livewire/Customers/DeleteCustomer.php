@@ -24,11 +24,11 @@ class DeleteCustomer extends Component
     {
         try {
             $this->customerRepository->delete($this->customerId);
-            $this->notifySuccess('messages.customer.deleted');
+            $this->notifySuccess(__('crud.customers.messages.deleted'));
             $this->dispatch('customer-deleted');
             $this->closeModal();
         } catch (\Exception $e) {
-            $this->notifyError('messages.customer.delete_error');
+            $this->notifyError(__('crud.common.messages.delete_error', ['model' => __('crud.customers.model.singular')]));
         }
     }
 

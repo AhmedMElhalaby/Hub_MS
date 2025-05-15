@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web([
             \App\Http\Middleware\ResolveLivewireTenant::class,
+            \App\Http\Middleware\SetLocale::class,
+
         ]);
         $middleware->api([
         ]);

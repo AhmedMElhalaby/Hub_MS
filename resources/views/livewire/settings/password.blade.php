@@ -1,10 +1,10 @@
 <section class="w-full">
-    <x-settings.layout heading="{{ __('Update password') }}" subheading="{{ __('Ensure your account is using a long, random password to stay secure') }}">
+    <x-settings.layout heading="{{ __('crud.settings.labels.password') }}" subheading="{{ __('crud.settings.labels.update_your_password') }}">
         <form wire:submit="save" class="mt-6 space-y-6">
             <flux:input
                 wire:model="current_password"
                 id="update_password_current_passwordpassword"
-                label="{{ __('Current password') }}"
+                label="{{ __('crud.users.fields.password') }}"
                 type="password"
                 name="current_password"
                 required
@@ -13,7 +13,7 @@
             <flux:input
                 wire:model="password"
                 id="update_password_password"
-                label="{{ __('New password') }}"
+                label="{{ __('crud.users.fields.password') }}"
                 type="password"
                 name="password"
                 required
@@ -22,7 +22,7 @@
             <flux:input
                 wire:model="password_confirmation"
                 id="update_password_password_confirmation"
-                label="{{ __('Confirm Password') }}"
+                label="{{ __('crud.users.fields.password') }}"
                 type="password"
                 name="password_confirmation"
                 required
@@ -31,11 +31,11 @@
 
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
+                    <flux:button variant="primary" type="submit" class="w-full">{{ __('crud.common.actions.save') }}</flux:button>
                 </div>
 
                 <x-action-message class="me-3" on="password-updated">
-                    {{ __('Saved.') }}
+                    {{ __('crud.common.messages.saved') }}
                 </x-action-message>
             </div>
         </form>

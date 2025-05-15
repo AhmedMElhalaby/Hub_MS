@@ -10,8 +10,8 @@ enum FinanceType: int
     public function label(): string
     {
         return match($this) {
-            self::Income => __('Income'),
-            self::Expense => __('Expense'),
+            self::Income => __('crud.finances.labels.income'),
+            self::Expense => __('crud.finances.labels.expense'),
         };
     }
 }

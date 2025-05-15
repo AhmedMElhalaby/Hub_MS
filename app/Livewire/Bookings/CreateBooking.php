@@ -123,10 +123,9 @@ class CreateBooking extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('booking-created');
-            $this->notifySuccess('messages.booking.created');
+            $this->notifySuccess(__('crud.bookings.messages.created'));
         } catch (\Exception $e) {
-            $this->notifyError($e->getMessage());
-            $this->notifyError('messages.booking.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.bookings.model.singular')]));
         }
     }
 

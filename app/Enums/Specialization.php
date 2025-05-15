@@ -11,10 +11,10 @@ enum Specialization: int
     public function label(): string
     {
         return match($this) {
-            self::Student => __('Student'),
-            self::Teacher => __('Teacher'),
-            self::Developer => __('Developer'),
-            self::Designer => __('Designer'),
+            self::Student => __('crud.customers.specialization.student'),
+            self::Teacher => __('crud.customers.specialization.teacher'),
+            self::Developer => __('crud.customers.specialization.developer'),
+            self::Designer => __('crud.customers.specialization.designer'),
         };
     }
 }

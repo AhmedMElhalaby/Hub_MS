@@ -103,10 +103,10 @@ class RenewBooking extends Component
             $this->reset(['startedAt', 'endedAt', 'planId', 'duration', 'total']);
             $this->closeModal();
             $this->dispatch('booking-renewed');
-            $this->notifySuccess('messages.booking.renew_processed');
+            $this->notifySuccess(__('crud.bookings.messages.renewed'));
         } catch (\Exception $e) {
             $this->notifyError($e->getMessage());
-            $this->notifyError('messages.booking.renew_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.bookings.model.singular')]));
         }
     }
 

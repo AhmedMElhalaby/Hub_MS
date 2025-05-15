@@ -25,11 +25,11 @@ class DeleteExpense extends Component
     {
         try {
             $this->expenseRepository->delete($this->expenseId);
-            $this->notifySuccess('messages.expense.deleted');
+            $this->notifySuccess(__('crud.expenses.messages.deleted'));
             $this->dispatch('expense-deleted');
             $this->closeModal();
         } catch (\Exception $e) {
-            $this->notifyError('messages.expense.delete_error');
+            $this->notifyError(__('crud.common.messages.delete_error', ['model' => __('crud.expenses.model.singular')]));
         }
     }
 

@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Enums\BookingStatus;
-use App\Enums\WorkspaceStatus;
 use App\Models\Workspace;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -10,7 +10,6 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Traits\WithSorting;
 use Livewire\Attributes\Layout;
-use Symfony\Component\HttpFoundation\Response;
 use League\Csv\Writer;
 
 #[Layout('components.layouts.app')]
@@ -50,7 +49,7 @@ class FinancesList extends Component
                 } elseif ($this->statusFilter === 'active') {
                     $query->where(function ($q) {
                         $q->whereNull('note')
-                          ->orWhere('note', 'not like', 'Voided:%');
+                            ->orWhere('note', 'not like', 'Voided:%');
                     });
                 }
             })
@@ -90,15 +89,13 @@ class FinancesList extends Component
     public function confirmVoid()
     {
         if ($this->selectedFinance->booking) {
-            // Update booking balance
             $this->selectedFinance->booking->increment('balance', $this->selectedFinance->amount);
         }
 
-        // Mark finance record as voided
         $this->selectedFinance->update(['note' => 'Voided: ' . ($this->selectedFinance->note ?? '')]);
 
         $this->showVoidModal = false;
-        session()->flash('message', __('Payment voided successfully.'));
+        session()->flash('message', __('crud.finances.messages.voided'));
     }
 
     public function getStatistics()
@@ -106,10 +103,10 @@ class FinancesList extends Component
         return [
             'total_income' => Finance::where('type', FinanceType::Income)->sum('amount'),
             'total_expense' => Finance::where('type', FinanceType::Expense)->sum('amount'),
-            'total_expected_payment' =>Booking::whereNotIn('status', [BookingStatus::Completed, BookingStatus::Cancelled])
-            ->sum('balance'),
+            'total_expected_payment' => Booking::whereNotIn('status', [BookingStatus::Completed, BookingStatus::Cancelled])
+                ->sum('balance'),
             'net_amount' => Finance::where('type', FinanceType::Income)->sum('amount') -
-                          Finance::where('type', FinanceType::Expense)->sum('amount'),
+                Finance::where('type', FinanceType::Expense)->sum('amount'),
             'monthly_income' => Finance::where('type', FinanceType::Income)
                 ->whereMonth('created_at', now()->month)
                 ->sum('amount'),
@@ -141,7 +138,7 @@ class FinancesList extends Component
                 } elseif ($this->statusFilter === 'active') {
                     $query->where(function ($q) {
                         $q->whereNull('note')
-                          ->orWhere('note', 'not like', 'Voided:%');
+                            ->orWhere('note', 'not like', 'Voided:%');
                     });
                 }
             })
@@ -152,13 +149,13 @@ class FinancesList extends Component
 
         // Add headers
         $csv->insertOne([
-            'Type',
-            'Reference',
-            'Amount',
-            'Note',
-            'Date',
-            'Payment Method',
-            'Status'
+            __('crud.finances.fields.type'),
+            __('crud.finances.fields.reference'),
+            __('crud.finances.fields.amount'),
+            __('crud.finances.fields.note'),
+            __('crud.finances.fields.date'),
+            __('crud.finances.fields.payment_method'),
+            __('crud.finances.fields.status')
         ]);
 
         // Add data
@@ -189,8 +186,8 @@ class FinancesList extends Component
 
     public function mount()
     {
-        $this->sortField = 'created_at'; // Set default sort field
-        $this->sortDirection = 'desc'; // Set default sort direction
+        $this->sortField = 'created_at';
+        $this->sortDirection = 'desc';
 
         // Default selected columns
         $this->selectedColumns = [
@@ -225,7 +222,7 @@ class FinancesList extends Component
                 } elseif ($this->statusFilter === 'active') {
                     $query->where(function ($q) {
                         $q->whereNull('note')
-                          ->orWhere('note', 'not like', 'Voided:%');
+                            ->orWhere('note', 'not like', 'Voided:%');
                     });
                 }
             })
@@ -254,7 +251,7 @@ class FinancesList extends Component
         // Add selected headers
         $headers = [];
         foreach ($this->selectedColumns as $column) {
-            $headers[] = __(ucfirst(str_replace('_', ' ', $column)));
+            $headers[] = __('crud.finances.fields.' . $column);
         }
         $csv->insertOne($headers);
 

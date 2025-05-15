@@ -27,9 +27,9 @@ class CancelBooking extends Component
             $this->bookingRepository->cancel($this->bookingId);
             $this->closeModal();
             $this->dispatch('booking-canceled');
-            $this->notifySuccess('messages.booking.cancel');
+            $this->notifySuccess(__('crud.bookings.messages.canceled'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.booking.cancel_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.bookings.model.singular')]));
         }
     }
 

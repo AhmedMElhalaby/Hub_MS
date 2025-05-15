@@ -15,7 +15,7 @@ class Notification extends Component
         $this->notifications[] = [
             'id' => uniqid(),
             'type' => $data['type'],
-            'message' => $data['message'],
+            'message' => __($data['message'], $data['params'] ?? []),
         ];
     }
 

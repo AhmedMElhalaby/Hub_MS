@@ -10,8 +10,8 @@ enum PaymentMethod: int
     public function label(): string
     {
         return match($this) {
-            self::Cash => __('Cash'),
-            self::Banking => __('Banking'),
+            self::Cash => __('crud.finances.payment_method.cash'),
+            self::Banking => __('crud.finances.payment_method.banking'),
         };
     }
 }

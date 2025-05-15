@@ -56,9 +56,9 @@ class SendCredentials extends Component
             $this->closeModal();
             $this->reset(['messageText', 'bookingId']);
             $this->dispatch('credentials-sent');
-            $this->notifySuccess('messages.booking.credentials_sent');
+            $this->notifySuccess(__('crud.common.messages.sent'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.booking.credentials_send_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.bookings.model.singular')]));
         }
     }
 

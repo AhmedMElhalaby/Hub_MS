@@ -11,9 +11,9 @@ enum WorkspaceStatus: int
     public function label(): string
     {
         return match ($this) {
-            self::Booked => __('Booked'),
-            self::Available => __('Available'),
-            self::Maintenance => __('Maintenance'),
+            self::Booked => __('crud.workspaces.status.booked'),
+            self::Available => __('crud.workspaces.status.available'),
+            self::Maintenance => __('crud.workspaces.status.maintenance'),
         };
     }
 

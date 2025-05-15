@@ -4,32 +4,32 @@
         <x-slot:tabs>
             <a href="{{ route('tenant.settings.general') }}" wire:navigate>
                 <x-tabs.tab name="settings.general" icon="cog">
-                    {{ __('General Settings') }}
+                    {{ __('crud.settings.labels.basic_information') }}
                 </x-tabs.tab>
             </a>
             <a href="{{ route('tenant.settings.profile') }}" wire:navigate>
                 <x-tabs.tab name="settings.profile" icon="user">
-                    {{ __('Profile') }}
+                    {{ __('crud.settings.labels.profile') }}
                 </x-tabs.tab>
             </a>
             <a href="{{ route('tenant.settings.password') }}" wire:navigate>
                 <x-tabs.tab name="settings.password" icon="lock-closed">
-                    {{ __('Password') }}
+                    {{ __('crud.settings.labels.password') }}
                 </x-tabs.tab>
             </a>
             <a href="{{ route('tenant.settings.appearance') }}" wire:navigate>
                 <x-tabs.tab name="settings.appearance" icon="paint-brush">
-                    {{ __('Appearance') }}
+                    {{ __('crud.settings.labels.appearance') }}
                 </x-tabs.tab>
             </a>
             <a href="{{ route('tenant.settings.mikrotik') }}" wire:navigate>
                 <x-tabs.tab name="settings.mikrotik" icon="server">
-                    {{ __('Mikrotik') }}
+                    {{ __('crud.settings.labels.mikrotik') }}
                 </x-tabs.tab>
             </a>
             <a href="{{ route('tenant.settings.sms') }}" wire:navigate>
                 <x-tabs.tab name="settings.sms" icon="chat-bubble-oval-left-ellipsis">
-                    {{ __('SMS') }}
+                    {{ __('crud.settings.labels.sms') }}
                 </x-tabs.tab>
             </a>
         </x-slot:tabs>

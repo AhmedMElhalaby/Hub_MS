@@ -37,9 +37,9 @@ class EditWorkspace extends Component
             $this->reset();
             $this->closeModal();
             $this->dispatch('workspace-updated');
-            $this->notifySuccess('messages.workspace.updated');
+            $this->notifySuccess(__('crud.workspaces.messages.updated'));
         } catch (\Exception $e) {
-            $this->notifyError('messages.workspace.save_error');
+            $this->notifyError(__('crud.common.messages.error', ['model' => __('crud.workspaces.model.singular')]));
         }
     }
 

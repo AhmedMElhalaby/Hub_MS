@@ -12,10 +12,10 @@ enum PlanType: int
     public function label(): string
     {
         return match($this) {
-            self::Hourly => __('Hourly'),
-            self::Daily => __('Daily'),
-            self::Weekly => __('Weekly'),
-            self::Monthly => __('Monthly'),
+            self::Hourly => __('crud.plans.type.hourly'),
+            self::Daily => __('crud.plans.type.daily'),
+            self::Weekly => __('crud.plans.type.weekly'),
+            self::Monthly => __('crud.plans.type.monthly'),
         };
     }
 }

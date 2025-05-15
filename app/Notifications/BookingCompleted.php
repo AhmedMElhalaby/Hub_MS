@@ -22,10 +22,10 @@ class BookingCompleted extends Notification
     public function toArray($notifiable): array
     {
         return [
-            'title' => 'Booking Completed',
-            'message' => "Booking for {$this->booking->customer->name} has been completed.",
+            'title' => __('crud.bookings.messages.completed'),
+            'message' => __('crud.bookings.messages.booking_completed', ['customer' => $this->booking->customer->name]),
             'type' => 'info',
-            'link' => route('bookings.show', ['tenant'=>$this->booking->tenant->domain,'booking' => $this->booking->id])
+            'link' => route('tenant.bookings.show', ['tenant'=>$this->booking->tenant->domain,'booking' => $this->booking->id])
         ];
     }
 }

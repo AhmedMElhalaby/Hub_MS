@@ -27,7 +27,7 @@ class UserDetails extends Component
         try {
             $this->user = $this->userRepository->findById($user->id);
         } catch (\Exception $e) {
-            $this->notifyError('messages.user.not_found');
+            $this->notifyError(__('crud.common.messages.not_found', ['model' => __('crud.users.model.singular')]));
             return $this->redirect(route('tenant.users.index'));
         }
     }

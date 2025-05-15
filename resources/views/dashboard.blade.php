@@ -3,22 +3,22 @@
         <!-- Statistics Cards -->
         <div class="grid gap-4 md:grid-cols-3 mb-6">
             <x-stat-card
-                title="{{ __('Total Revenue') }}"
+                title="{{ __('crud.finances.labels.total_income') }}"
                 value="{{ number_format($totalRevenue, 2) }}"
-                description="{{ __('All time income') }}"
+                description="{{ __('crud.finances.labels.all_time_income') }}"
                 trend="up"
                 color="success"
             />
             <x-stat-card
-                title="{{ __('Active Bookings') }}"
+                title="{{ __('crud.bookings.model.plural') }}"
                 value="{{ $activeBookings }}"
-                description="{{ __('Current active bookings') }}"
+                description="{{ __('crud.bookings.labels.active_bookings') }}"
                 color="primary"
             />
             <x-stat-card
-                title="{{ __('Available Workspaces') }}"
+                title="{{ __('crud.workspaces.labels.available_workspaces') }}"
                 value="{{ $availableWorkspaces }}"
-                description="{{ __('Ready to book') }}"
+                description="{{ __('crud.workspaces.labels.ready_to_book') }}"
                 color="info"
             />
         </div>
@@ -27,15 +27,15 @@
             <!-- Recent Bookings -->
             <flux:card>
                 <flux:card.header>
-                    <flux:heading size="sm">{{ __('Recent Bookings') }}</flux:heading>
+                    <flux:heading size="sm">{{ __('crud.bookings.labels.recent_bookings') }}</flux:heading>
                 </flux:card.header>
                 <flux:card.content>
                     <flux:table>
                         <x-slot:header>
-                            <flux:table.head>{{ __('Customer') }}</flux:table.head>
-                            <flux:table.head>{{ __('Workspace') }}</flux:table.head>
-                            <flux:table.head>{{ __('Status') }}</flux:table.head>
-                            <flux:table.head>{{ __('Amount') }}</flux:table.head>
+                            <flux:table.head>{{ __('crud.customers.model.singular') }}</flux:table.head>
+                            <flux:table.head>{{ __('crud.workspaces.model.singular') }}</flux:table.head>
+                            <flux:table.head>{{ __('crud.bookings.fields.status') }}</flux:table.head>
+                            <flux:table.head>{{ __('crud.bookings.fields.total') }}</flux:table.head>
                         </x-slot:header>
                         <x-slot:body>
                             @forelse($recentBookings as $booking)
@@ -51,7 +51,7 @@
                                 </flux:table.row>
                             @empty
                                 <flux:table.row>
-                                    <flux:table.cell colspan="4" class="text-center">{{ __('No recent bookings.') }}</flux:table.cell>
+                                    <flux:table.cell colspan="4" class="text-center">{{ __('crud.common.messages.no_records', ['model' => __('crud.bookings.model.plural')]) }}</flux:table.cell>
                                 </flux:table.row>
                             @endforelse
                         </x-slot:body>
@@ -62,14 +62,14 @@
             <!-- Recent Finances -->
             <flux:card>
                 <flux:card.header>
-                    <flux:heading size="sm">{{ __('Recent Finances') }}</flux:heading>
+                    <flux:heading size="sm">{{ __('crud.finances.labels.recent_finances') }}</flux:heading>
                 </flux:card.header>
                 <flux:card.content>
                     <flux:table>
                         <x-slot:header>
-                            <flux:table.head>{{ __('Type') }}</flux:table.head>
-                            <flux:table.head>{{ __('Amount') }}</flux:table.head>
-                            <flux:table.head>{{ __('Date') }}</flux:table.head>
+                            <flux:table.head>{{ __('crud.finances.fields.type') }}</flux:table.head>
+                            <flux:table.head>{{ __('crud.finances.fields.amount') }}</flux:table.head>
+                            <flux:table.head>{{ __('crud.common.fields.date') }}</flux:table.head>
                         </x-slot:header>
                         <x-slot:body>
                             @forelse($recentFinances as $finance)
@@ -84,7 +84,7 @@
                                 </flux:table.row>
                             @empty
                                 <flux:table.row>
-                                    <flux:table.cell colspan="3" class="text-center">{{ __('No recent finances.') }}</flux:table.cell>
+                                    <flux:table.cell colspan="3" class="text-center">{{ __('crud.common.messages.no_records', ['model' => __('crud.finances.model.plural')]) }}</flux:table.cell>
                                 </flux:table.row>
                             @endforelse
                         </x-slot:body>
@@ -93,5 +93,4 @@
             </flux:card>
         </div>
     </div>
-
 </x-layouts.app>

@@ -26,7 +26,7 @@ class WorkspaceDetails extends Component
         try {
             $this->workspace = $this->workspaceRepository->findWithBookings($workspace->id);
         } catch (\Exception $e) {
-            $this->notifyError('messages.workspace.not_found');
+            $this->notifyError(__('crud.common.messages.not_found', ['model' => __('crud.workspaces.model.singular')]));
             return $this->redirect(route('tenant.workspaces.index'));
         }
     }
