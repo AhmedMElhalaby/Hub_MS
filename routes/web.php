@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Auth\AdminLoginController;
 use App\Http\Controllers\TenantRegistrationController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,27 @@ Route::domain(config('app.url'))->group(function () {
 
     Route::post('/register/tenant', [TenantRegistrationController::class, 'store'])
         ->name('register.store');
+
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->group(function () {
+        // Admin Authentication Routes (accessible without admin login)
+        Route::get('login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [AdminLoginController::class, 'login']);
+
+        // Admin Panel Routes (require admin login)
+        Route::middleware(['auth.admin'])->group(function () {
+            Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
+            Route::get('/', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+            Route::get('/tenants', [\App\Http\Controllers\Admin\AdminTenantController::class, 'index'])->name('tenants.index');
+            Route::get('/tenants/{tenant}', [\App\Http\Controllers\Admin\AdminTenantController::class, 'show'])->name('tenants.show');
+            Route::get('/subscriptions', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
+            Route::get('/subscriptions/{subscription}', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'show'])->name('subscriptions.show');
+            Route::get('/admin-users', [\App\Http\Controllers\Admin\AdminUserController::class, 'index'])->name('admin_users.index');
+            Route::get('/admin-users/create', [\App\Http\Controllers\Admin\AdminUserController::class, 'create'])->name('admin_users.create');
+            Route::get('/admin-users/{admin}/edit', [\App\Http\Controllers\Admin\AdminUserController::class, 'edit'])->name('admin_users.edit');
+            // Other admin routes will be added here later
+        });
+    });
 });
 
 Route::domain('{tenant}.'.config('app.url'))->name('tenant.')->group(function () {

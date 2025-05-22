@@ -19,8 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web([
             \App\Http\Middleware\ResolveLivewireTenant::class,
             \App\Http\Middleware\SetLocale::class,
-
+            'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class,
         ]);
+
         $middleware->api([
         ]);
     })
