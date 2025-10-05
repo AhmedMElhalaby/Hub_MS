@@ -19,7 +19,7 @@ class Setting extends Model
     public static function set($key, $value, $group = 'general')
     {
         static::updateOrCreate(
-            ['key' => $key],
+            ['key' => $key, 'tenant_id' => app()->get('tenant')->id],
             ['value' => $value, 'group' => $group]
         );
     }
