@@ -17,12 +17,7 @@ class Mikrotik extends Component
 
     public function save()
     {
-        $this->validate([
-            'mikrotikHost' => 'required_if:mikrotikEnabled,true',
-        ]);
-
         Setting::set('mikrotik_enabled', $this->mikrotikEnabled);
-
         return redirect(request()->header('Referer'));
     }
 
