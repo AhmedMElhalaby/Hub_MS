@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Setting extends Model
 {
     use BelongsToTenant;
-    protected $fillable = ['key', 'value', 'group'];
+    protected $fillable = ['tenant_id', 'key', 'value', 'group'];
 
     public static function get($key, $default = null)
     {
