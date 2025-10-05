@@ -40,16 +40,7 @@ if (!function_exists('get_tenant_domain')) {
             Log::debug('get_tenant_domain:' . __LINE__ . ' - Livewire request detected', ['referer' => $referer]);
 
             if ($referer) {
-                $refererPath = parse_url($referer, PHP_URL_PATH);
-                $pathParts = explode('/', trim($refererPath, '/'));
-
-                // For prefix-based routing
-                if (!empty($pathParts[0])) {
-                    Log::debug('get_tenant_domain:' . __LINE__ . ' - Found tenant from Livewire referer path', ['tenant' => $pathParts[0]]);
-                    return $pathParts[0];
-                }
-
-                // For subdomain-based routing
+                // Only use subdomain-based routing from referer host
                 $refererHost = parse_url($referer, PHP_URL_HOST);
                 if ($refererHost) {
                     $hostParts = explode('.', $refererHost);
@@ -67,6 +58,8 @@ if (!function_exists('get_tenant_domain')) {
                 return $sessionTenant;
             }
         }
+
+        // Use subdomain from current request host
         if (is_subdomain_request()) {
             $host = $request->getHost();
             $parts = explode('.', $host);
@@ -78,18 +71,6 @@ if (!function_exists('get_tenant_domain')) {
                 return $parts[0];
             }
         }
-        // Try to get tenant from route parameter first
-        $routeTenant = $request->route('tenant');
-        Log::debug('get_tenant_domain:' . __LINE__ . ' - Route tenant parameter', ['tenant' => $routeTenant]);
-
-        if ($routeTenant && is_string($routeTenant)) {
-            Log::debug('get_tenant_domain:' . __LINE__ . ' - Found tenant from route parameter', ['tenant' => $routeTenant]);
-            session(['tenant_domain' => $routeTenant]); // Store in session for Livewire requests
-            return $routeTenant;
-        }
-
-        // Only check subdomain if we're using subdomain routing
-
 
         Log::debug('get_tenant_domain:' . __LINE__ . ' - No tenant domain found');
         return null;
