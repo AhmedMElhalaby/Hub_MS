@@ -11,10 +11,11 @@ use App\Models\MikrotikProfile;
 use App\Models\Setting;
 use Illuminate\Validation\Rules\Enum;
 use Livewire\Attributes\On;
+use App\Traits\WithTenantContext;
 
 class EditPlan extends Component
 {
-    use WithModal, NotificationService;
+    use WithModal, NotificationService, WithTenantContext;
 
     public $planId;
     public $type = '';

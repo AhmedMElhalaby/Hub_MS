@@ -11,10 +11,11 @@ use App\Enums\PlanType;
 use App\Models\Setting;
 use Illuminate\Validation\Rules\Enum;
 use Livewire\Attributes\On;
+use App\Traits\WithTenantContext;
 
 class CreatePlan extends Component
 {
-    use WithModal, NotificationService;
+    use WithModal, NotificationService, WithTenantContext;
 
     public $type = '';
     public $price = '';
