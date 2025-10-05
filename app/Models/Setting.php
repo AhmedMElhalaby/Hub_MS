@@ -4,11 +4,10 @@ namespace App\Models;
 
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\WithTenantContext;
 
 class Setting extends Model
 {
-    use BelongsToTenant, WithTenantContext;
+    use BelongsToTenant;
     protected $fillable = ['tenant_id', 'key', 'value', 'group'];
 
     public static function get($key, $default = null)
@@ -20,7 +19,7 @@ class Setting extends Model
     public static function set($key, $value, $group = 'general')
     {
         static::updateOrCreate(
-            ['key' => $key, 'tenant_id' => app()->get('tenant')->id],
+            ['key' => $key, 'tenant_id' => auth()->user()->tenant_id],
             ['value' => $value, 'group' => $group]
         );
     }
