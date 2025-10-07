@@ -1,4 +1,4 @@
-name: Deploy Laravel to EC2
+name: Deploy Laravel to Lightsail
 
 on:
   push:
@@ -12,35 +12,50 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install SSH Key
+    # 🔑 Recommended change: Use a generic user like 'ubuntu' or 'bitnami'
+    # The SSH_USER secret should reflect the actual user on the Lightsail instance.
+    - name: Install SSH Key and Known Hosts
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        # Write the private key from secrets
+        echo "${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+        # Add the Lightsail IP/Host to known hosts
+        ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
 
-    - name: Deploy to EC2
+    - name: Deploy to Lightsail
       env:
         BRANCH_NAME: ${{ github.ref_name }}
       run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+        # 🔗 Use the correct SSH user (e.g., 'ubuntu', 'bitnami', 'ec2-user') and Lightsail Host IP
+        ssh ${{ secrets.LIGHTSAIL_SSH_USER }}@${{ secrets.LIGHTSAIL_HOST }} << 'EOF'
           echo "Deploying branch: $BRANCH_NAME"
-    
+          
+          # Determine deployment path based on branch
           if [ "$BRANCH_NAME" = "master" ]; then
             DEPLOY_PATH="${{ secrets.PROD_DEPLOY_PATH }}"
           else
             DEPLOY_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
           fi
-    
-          cd \$DEPLOY_PATH
-    
-          echo "Current directory: \$PWD"
-    
-          git pull origin $BRANCH_NAME
+          
+          # 💻 Deployment Commands 💻
+          cd $DEPLOY_PATH
+          
+          echo "Current directory: $PWD"
+          
+          # Update code
+          sudo git pull origin $BRANCH_NAME
+          
+          # Laravel/PHP dependencies
           composer install --no-dev --optimize-autoloader
           php artisan migrate --force
+          
+          # Frontend assets (if used)
           npm install
           npm run build
-          chown -R nginx:nginx storage bootstrap/cache
-          chmod -R 775 storage bootstrap/cache
+          
+          # Update permissions. 
+          # 💡 NOTE: The user here (www-data or bitnami) MUST match your Lightsail stack's web server user.
+          sudo chown -R www-data:www-data storage bootstrap/cache
+          sudo chmod -R 775 storage bootstrap/cache
         EOF
