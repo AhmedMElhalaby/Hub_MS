@@ -41,7 +41,7 @@ class SendCredentials extends Component
                 $this->messageText
             );
 
-            // $this->booking->customer->sendMessage($message);
+            $this->booking->customer->sendMessage($message);
 
             $this->booking->update([
                 'credentials_is_sent' => true,
