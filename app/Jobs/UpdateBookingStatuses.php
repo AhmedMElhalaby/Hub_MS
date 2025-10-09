@@ -36,10 +36,10 @@ class UpdateBookingStatuses implements ShouldQueue
                     $booking->workspace->markAsAvailable();
 
                     // Send notification to all admin users
-                    User::query()
-                        ->each(function ($admin) use ($booking) {
-                            $admin->notify(new BookingCompleted($booking));
-                        });
+                    // User::query()
+                    //     ->each(function ($admin) use ($booking) {
+                    //         $admin->notify(new BookingCompleted($booking));
+                    //     });
 
                     DB::commit();
 
